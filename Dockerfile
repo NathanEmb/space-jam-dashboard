@@ -1,5 +1,7 @@
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
+RUN apt-get -y update; apt-get -y install curl
+
 WORKDIR /app
 
 ADD . /app
