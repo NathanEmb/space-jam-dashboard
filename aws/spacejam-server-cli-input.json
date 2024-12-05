@@ -2,10 +2,10 @@
     "containerDefinitions": [
         {
             "name": "spacejam-server",
-            "image": "585008081433.dkr.ecr.us-east-2.amazonaws.com/spacejamprod/server:a371c15",
-            "cpu": 819,
-            "memory": 922,
-            "memoryReservation": 512,
+            "image": "585008081433.dkr.ecr.us-east-2.amazonaws.com/spacejamprod/server",
+            "cpu": 502,
+            "memory": 1014,
+            "memoryReservation": 502,
             "portMappings": [
                 {
                     "containerPort": 80,
@@ -70,5 +70,6 @@
     "requiresCompatibilities": [
         "EC2"
     ],
-    "cpu": "922"
+    "cpu": "1024",
+    "memory": "1024"
 }
