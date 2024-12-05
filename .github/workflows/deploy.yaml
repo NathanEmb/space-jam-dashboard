@@ -50,6 +50,12 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+    - name: Scale Server Down
+      uses: zachelrath/github-action-ecs-scale@1.2.0
+      with:
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        desired-count: 0
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
@@ -66,3 +72,10 @@ jobs:
         service: ${{ env.ECS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: true
+      
+    - name: Scale Server Up
+      uses: zachelrath/github-action-ecs-scale@1.2.0
+      with:
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        desired-count: 1
