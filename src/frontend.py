@@ -1,43 +1,62 @@
+import datetime as dt
+import logging
+
 import panel as pn
+
 import backend as be
 
 pn.extension("tabulator")
 
-all_stats = be.get_league_all_raw_stats_df(be.get_league())
-all_rankings = be.get_league_all_raw_data_rankings(be.get_league())
-cat_stats = be.get_league_cat_raw_stats_df(be.get_league())
-cat_rankings = be.get_league_cat_data_rankings(be.get_league())
+logger = logging.getLogger()
 
 
-def get_dataframe(mode: pn.widgets.Select):
+class LeagueData:
+    def __init__(self):
+        self.data = be.get_league()
+        self.last_updated = dt.datetime.now()
+
+    def update(self):
+        self.data = be.get_league()
+        self.last_updated = dt.datetime.now()
+
+
+def get_dataframe(mode: str, league_data: LeagueData):
+    logger.info(f"Returning League Wide stats Dataframe for {league_data.data.league_id}")
     if mode == "All Data - Raw Stats":
-        df = all_stats
+        df = be.get_league_all_raw_stats_df(league_data.data)
     elif mode == "All Data - Ranked":
-        df = all_rankings
+        df = be.get_league_all_raw_data_rankings(league_data.data)
     elif mode == "Categories - Raw Stats":
-        df = cat_stats
+        df = be.get_league_cat_raw_stats_df(league_data.data)
     elif mode == "Categories - Rankings":
-        df = cat_rankings
+        df = be.get_league_cat_data_rankings(league_data.data)
     return df
 
 
-mode = pn.widgets.Select(
-    name="Mode",
-    options=[
-        "Categories - Rankings",
-        "Categories - Raw Stats",
-        "All Data - Ranked",
-        "All Data - Raw Stats",
-    ],
-)
+def app():
+    league_data = LeagueData()
 
-interactive_df = pn.bind(get_dataframe, mode)
+    mode = pn.widgets.Select(
+        name="Mode",
+        options=[
+            "Categories - Rankings",
+            "Categories - Raw Stats",
+            "All Data - Ranked",
+            "All Data - Raw Stats",
+        ],
+    )
+    refresh_button = pn.widgets.Button(
+        name="Refresh Stats"
+    )  # doesn't work. my interactive table is f-d beyond comprehension
 
-interactive_table = pn.widgets.Tabulator(interactive_df, theme="site", show_index=False)
+    interactive_df = pn.bind(get_dataframe, mode=mode, league_data=league_data)
+    interactive_table = pn.widgets.Tabulator(interactive_df, theme="site", show_index=False)
+    return pn.template.ReactTemplate(
+        title="Space Jam Dashboard",
+        sidebar=[refresh_button, mode],
+        main=[interactive_table],
+        sidebar_width=150,
+    )
 
-pn.template.ReactTemplate(
-    title="Space Jam Dashboard",
-    sidebar=[mode],
-    main=[interactive_table],
-    sidebar_width=150,
-).servable()
+
+app().servable()

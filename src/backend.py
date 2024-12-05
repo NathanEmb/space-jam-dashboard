@@ -1,8 +1,11 @@
+from copy import deepcopy
+from datetime import datetime, timedelta
+
 import pandas as pd
+import pytz
+from espn_api.basketball import League, Team
 
-from espn_api.basketball import League
-
-import constants as const
+import src.constants as const
 
 
 def get_league(league_id: int = const.SPACEJAM_LEAGUE_ID, year: int = const.YEAR):
@@ -12,7 +15,7 @@ def get_league(league_id: int = const.SPACEJAM_LEAGUE_ID, year: int = const.YEAR
 def get_league_all_raw_stats_df(league: League):
     league_stats = []
     for team in league.teams:
-        temp_dict = team.stats.copy()
+        temp_dict = deepcopy(team.stats)
         temp_dict["Team"] = team.team_name
         temp_dict["Standing"] = team.standing
         league_stats.append(temp_dict)
@@ -20,7 +23,7 @@ def get_league_all_raw_stats_df(league: League):
     df = pd.DataFrame(league_stats)
 
     df = df.astype(const.ALL_RAW_DATA_TABLE_DEF)
-    return df[list(const.ALL_RAW_DATA_TABLE_DEF.keys())]
+    return df[list(const.ALL_RAW_DATA_TABLE_DEF.keys())].sort_values(by="Standing")
 
 
 def get_league_all_raw_data_rankings(league: League):
@@ -34,21 +37,15 @@ def get_league_all_raw_data_rankings(league: League):
     ranked_df["Avg. Cat. Rank"] = ranked_df.mean(axis=1)
 
     # Concatenate with non-numeric columns
-    ranked_df = pd.concat(
-        [
-            ranked_df,
-            raw_stats_df.select_dtypes(exclude="number"),
-        ],
-        axis=1,
-    )
+    ranked_df = pd.concat([ranked_df, raw_stats_df.select_dtypes(exclude="number")], axis=1)
 
-    return ranked_df[list(const.ALL_DATA_RANKED_TABLE_DEF.keys())]
+    return ranked_df[list(const.ALL_DATA_RANKED_TABLE_DEF.keys())].sort_values(by="Standing")
 
 
 def get_league_cat_raw_stats_df(league: League):
     league_stats = []
     for team in league.teams:
-        temp_dict = team.stats.copy()
+        temp_dict = deepcopy(team.stats)
         temp_dict["Team"] = team.team_name
         temp_dict["Standing"] = team.standing
         league_stats.append(temp_dict)
@@ -56,7 +53,7 @@ def get_league_cat_raw_stats_df(league: League):
     df = pd.DataFrame(league_stats)
 
     df = df.astype(const.CAT_ONLY_RAW_DATA_TABLE_DEF)
-    return df[list(const.CAT_ONLY_RAW_DATA_TABLE_DEF.keys())]
+    return df[list(const.CAT_ONLY_RAW_DATA_TABLE_DEF.keys())].sort_values(by="Standing")
 
 
 def get_league_cat_data_rankings(league: League):
@@ -70,14 +67,16 @@ def get_league_cat_data_rankings(league: League):
     ranked_df["Avg. Cat. Rank"] = ranked_df.mean(axis=1)
 
     # Concatenate with non-numeric columns
-    ranked_df = pd.concat(
-        [
-            ranked_df,
-            raw_stats_df.select_dtypes(exclude="number"),
-        ],
-        axis=1,
-    )
-    return ranked_df[list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys())]
+    ranked_df = pd.concat([ranked_df, raw_stats_df.select_dtypes(exclude="number")], axis=1)
+    return ranked_df[list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys())].sort_values(by="Standing")
+
+
+def get_average_team_stats(team: Team, num_days: int):
+    """Get Stats for team averaged over specified number of days From todays date."""
+    today = datetime.now(tz=pytz.timezone("America/New_York"))
+    start_date = timedelta(days=num_days)
+
+    team.roster
 
 
 if __name__ == "__main__":
