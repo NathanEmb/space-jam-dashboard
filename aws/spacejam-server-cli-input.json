@@ -1,5 +1,4 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-2:585008081433:task-definition/spacejam-server:17",
     "containerDefinitions": [
         {
             "name": "spacejam-server",
@@ -62,42 +61,8 @@
     "family": "spacejam-server",
     "executionRoleArn": "arn:aws:iam::585008081433:role/ecsTaskExecutionRole",
     "networkMode": "bridge",
-    "revision": 17,
     "volumes": [],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-        },
-        {
-            "name": "ecs.capability.execution-role-awslogs"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
-        },
-        {
-            "name": "ecs.capability.container-health-check"
-        },
-        {
-            "name": "ecs.capability.execution-role-ecr-pull"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
-        }
-    ],
     "placementConstraints": [],
-    "compatibilities": [
-        "EC2"
-    ],
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
@@ -105,7 +70,5 @@
     "requiresCompatibilities": [
         "EC2"
     ],
-    "cpu": "922",
-    "registeredAt": "2024-12-03T01:38:11.728000-05:00",
-    "registeredBy": "arn:aws:sts::585008081433:assumed-role/AWSReservedSSO_AdministratorAccess_e8ccef5b6519291a/nembaugh-dev"
+    "cpu": "922"
 }
