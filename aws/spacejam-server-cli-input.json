@@ -4,7 +4,7 @@
             "name": "spacejam-server",
             "image": "585008081433.dkr.ecr.us-east-2.amazonaws.com/spacejamprod/server",
             "cpu": 502,
-            "memory": 1014,
+            "memory": 922,
             "memoryReservation": 502,
             "portMappings": [
                 {
@@ -71,5 +71,5 @@
         "EC2"
     ],
     "cpu": "1024",
-    "memory": "1024"
+    "memory": "952"
 }
