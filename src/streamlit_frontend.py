@@ -30,7 +30,9 @@ team_stats_df = be.get_league_all_raw_data_rankings(league_data)
 # Sidebar for page selection
 st.sidebar.title("Navigation")
 chosen_team = st.sidebar.selectbox("Team", teams)
-page = st.sidebar.radio("Select a Page", ("League Overview", "Team Overview", "Matchup Overview"))
+page = st.sidebar.radio(
+    "Select a Page", ("League Overview", "Team Overview")
+)  # , "Matchup Overview"))
 
 # League Overview Page
 if page == "League Overview":
