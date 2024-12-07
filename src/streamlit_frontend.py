@@ -46,8 +46,10 @@ elif page == "Team Overview":
     st.write("Stats for", chosen_team)
     timeframe = st.radio(label="Time:", options=["30 Days", "15 Days", "7 Days"], horizontal=True)
     timeframe_num = int(timeframe.split(" ")[0])
+
     team_avg_stats = be.get_average_team_stats(team_data, timeframe_num)
-    st.table(pd.DataFrame(team_avg_stats).T.fillna(0))
+    with st.expander("Show Player Data"):
+        st.dataframe(pd.DataFrame(team_avg_stats).T.fillna(0))
 
 # Matchup Overview Page
 elif page == "Matchup Overview":

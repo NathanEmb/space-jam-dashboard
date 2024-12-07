@@ -1,6 +1,8 @@
 SPACEJAM_LEAGUE_ID = 233677
 YEAR = 2025
 
+NINE_CATS = ["PTS", "BLK", "STL", "AST", "REB", "TO", "3PM", "FG%", "FT%"]
+
 ALL_RAW_DATA_TABLE_DEF = {
     "Team": str,
     "Standing": int,
