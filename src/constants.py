@@ -1,6 +1,8 @@
 SPACEJAM_LEAGUE_ID = 233677
 YEAR = 2025
 
+NINE_CATS = ["PTS", "BLK", "STL", "AST", "REB", "TO", "3PM", "FG%", "FT%"]
+
 ALL_RAW_DATA_TABLE_DEF = {
     "Team": str,
     "Standing": int,
@@ -67,19 +69,8 @@ CAT_ONLY_DATA_RANKED_TABLE_DEF = {
     "FT%": int,
 }
 
-WANT_BIG_NUM = [
-    "PTS",
-    "BLK",
-    "STL",
-    "AST",
-    "REB",
-    "FGM",
-    "FGA",
-    "FTM",
-    "FTA",
-    "3PM",
-    "FG%",
-    "FT%",
-]
+WANT_BIG_NUM = ["PTS", "BLK", "STL", "AST", "REB", "FGM", "FGA", "FTM", "FTA", "3PM", "FG%", "FT%"]
+
+WANT_BIG_NUM_CATS = ["PTS", "BLK", "STL", "AST", "REB", "3PM", "FG%", "FT%"]
 
 WANT_SMALL_NUM = ["Standing", "TO"]

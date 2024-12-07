@@ -6,8 +6,8 @@ WORKDIR /app
 
 ADD . /app
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=.
 
 RUN uv sync --frozen 
 
-CMD ["uv", "run", "panel", "serve", "src/frontend.py", "--address", "0.0.0.0", "--port", "5006", "--allow-websocket-origin=18.222.161.54:5006", "--liveness" ] 
+CMD ["uv", "run",  "streamlit", "run", "src/streamlit_frontend.py", "--server.port", "5006" ] 
