@@ -67,19 +67,8 @@ CAT_ONLY_DATA_RANKED_TABLE_DEF = {
     "FT%": int,
 }
 
-WANT_BIG_NUM = [
-    "PTS",
-    "BLK",
-    "STL",
-    "AST",
-    "REB",
-    "FGM",
-    "FGA",
-    "FTM",
-    "FTA",
-    "3PM",
-    "FG%",
-    "FT%",
-]
+WANT_BIG_NUM = ["PTS", "BLK", "STL", "AST", "REB", "FGM", "FGA", "FTM", "FTA", "3PM", "FG%", "FT%"]
+
+WANT_BIG_NUM_CATS = ["PTS", "BLK", "STL", "AST", "REB", "3PM", "FG%", "FT%"]
 
 WANT_SMALL_NUM = ["Standing", "TO"]
