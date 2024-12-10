@@ -20,5 +20,4 @@ compliment_nathan = [
     },
 ]
 
-mainpage_prompt_map = {0.8: insulting_monologue, 0.2: compliment_nathan}
-
+mainpage_prompt_map = {0.7: insulting_monologue, 0.3: compliment_nathan}
