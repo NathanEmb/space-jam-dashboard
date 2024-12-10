@@ -86,7 +86,7 @@ def get_average_team_stats(team: Team, num_days: int) -> pd.DataFrame:
     stat_key = f"{const.YEAR}_last_{num_days}"
     player_avgs = {player.name: player.stats[stat_key].get("avg", {}) for player in team.roster}
     player_avgs = pd.DataFrame(player_avgs).T.fillna(0)
-    return player_avgs.replace("Infinity", 0)  # Replace Infinity with 0 kinda hacky but eh
+    return player_avgs.replace("Infinity", 0).round(2)  # Replace Infinity with 0 kinda hacky but eh
 
 
 def agg_player_avgs(

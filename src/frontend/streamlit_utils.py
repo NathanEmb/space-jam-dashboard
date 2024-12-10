@@ -1,14 +1,16 @@
 import streamlit as st
 
 
-def create_metric_grid(data: dict[str, float], num_cats_per_row: int = 2):
-    
+def create_metric_grid(data: dict[str, float], num_cats_per_row: int = 3):
+    j = 0
+    rows_of_cols = []
     while data:
-        inner_cols = st.columns(num_cats_per_row)
+        rows_of_cols.append(st.columns(num_cats_per_row))
         for i in range(num_cats_per_row):
             try:
                 cat = list(data.keys())[0]
             except IndexError:
                 break
             val = data.pop(cat)
-            inner_cols[i].metric(cat, val)
+            rows_of_cols[j][i].metric(cat, val)
+        j += 1
