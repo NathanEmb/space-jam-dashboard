@@ -45,5 +45,6 @@ st.markdown(
 )
 
 gyr = plt.colormaps["RdYlGn"].reversed()
+league_df = league_df.set_index("Team")
 league_df_styled = league_df.style.background_gradient(cmap=gyr)
-st.dataframe(league_df_styled, use_container_width=True, hide_index=True, height=460)
+st.dataframe(league_df_styled, use_container_width=True, height=460, on_select="ignore")
