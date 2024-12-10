@@ -1,9 +1,13 @@
+import os
+import random
 from copy import deepcopy
 
 import pandas as pd
 from espn_api.basketball import League, Team
+from groq import Groq
 
 import src.constants as const
+import src.prompts as prompts
 
 
 def get_league(league_id: int = const.SPACEJAM_LEAGUE_ID, year: int = const.YEAR) -> League:
@@ -129,6 +133,51 @@ def get_team_breakdown(team_cat_ranks: dict) -> tuple[dict, dict, dict]:
         else:
             weaknesses[cat] = team_cat_ranks[cat]
     return strengths, weaknesses, punts
+
+
+def get_prompt(prompt_map: dict):
+    """
+    Returns a value from the dictionary based on the weighted probability.
+
+    :param prompt_map: A dictionary where keys are percentages (adding up to 1.0) and values are strings.
+    :return: A randomly selected value based on the key percentages.
+    """
+    rand_val = random.random()  # Random float between 0 and 1.
+    cumulative = 0
+
+    for percent, prompt in sorted(prompt_map.items()):
+        cumulative += percent
+        if rand_val < cumulative:
+            return prompt
+
+
+def get_mainpage_joke():
+    client = Groq(
+        # This is the default and can be omitted
+        api_key=os.environ.get("GROQ_API_KEY")
+    )
+    prompt = get_prompt(prompts.mainpage_prompt_map)
+    chat_completion = client.chat.completions.create(messages=prompt, model="llama3-8b-8192")
+    return chat_completion.choices[0].message.content
+
+
+def get_teamviewer_joke(team_name):
+    client = Groq(
+        # This is the default and can be omitted
+        api_key=os.environ.get("GROQ_API_KEY")
+    )
+    prompt = [
+        {
+            "role": "system",
+            "content": "Your job is to roast fantasy basketball team names. Be witty, and a little mean.",
+        },
+        {
+            "role": "user",
+            "content": f"Roast the team name choice of: '{team_name}'. Limit response to 100 characters",
+        },
+    ]
+    chat_completion = client.chat.completions.create(messages=prompt, model="llama3-8b-8192")
+    return chat_completion.choices[0].message.content
 
 
 if __name__ == "__main__":
