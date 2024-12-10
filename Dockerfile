@@ -10,4 +10,4 @@ ENV PYTHONPATH=.
 
 RUN uv sync --frozen 
 
-CMD ["uv", "run",  "streamlit", "run", "src/streamlit_frontend.py", "--server.port", "5006" ] 
+CMD ["uv", "run",  "streamlit", "run", "src/frontend/Spacejam_Dashboard.py", "--server.port", "5006" ] 
