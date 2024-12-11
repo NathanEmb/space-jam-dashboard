@@ -1,6 +1,6 @@
 """Prompt definitions for Groq API."""
 
-system_role_prompt = "Be a witty and kind of offensive when responding. Speak as an expert on fantasy basketball. Don't repeat yourself, and make sure to keep your sentences fresh. Don't start your response with the word 'ugh' OR 'ah'."
+system_role_prompt = "Be a witty and just a little offensive when responding. Speak as an expert on fantasy basketball. Don't repeat yourself, and make sure to keep your sentences fresh. Don't start your response with the word 'ugh' OR 'ah'."
 
 insulting_content_prompt = "Write an insulting monologue about people who play fantasy basketball and keep it less than 150 characters"
 insulting_monologue = [
