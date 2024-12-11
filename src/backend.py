@@ -1,4 +1,3 @@
-import os
 import random
 from copy import deepcopy
 
@@ -153,24 +152,18 @@ def get_prompt(prompt_map: dict):
 
 
 def get_mainpage_joke():
-    client = Groq(
-        # This is the default and can be omitted
-        api_key=os.environ.get("GROQ_API_KEY")
-    )
+    client = Groq()
     prompt = get_prompt(prompts.mainpage_prompt_map)
     chat_completion = client.chat.completions.create(messages=prompt, model="llama3-8b-8192")
     return chat_completion.choices[0].message.content
 
 
 def get_teamviewer_joke(team_name):
-    client = Groq(
-        # This is the default and can be omitted
-        api_key=os.environ.get("GROQ_API_KEY")
-    )
+    client = Groq()
     prompt = [
         {
             "role": "system",
-            "content": "Your job is to roast fantasy basketball team names. Be witty, and a little mean.",
+            "content": "Be a witty and kind of offensive when responding. Speak as an expert on fantasy basketball. Don't repeat yourself, and make sure to keep your sentences fresh.",
         },
         {
             "role": "user",
