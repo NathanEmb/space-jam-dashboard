@@ -2,7 +2,7 @@ import random
 from copy import deepcopy
 
 import pandas as pd
-from espn_api.basketball import League, Team
+from espn_api.basketball import League, Matchup, Team
 from groq import Groq
 
 import src.constants as const
@@ -12,14 +12,14 @@ import src.prompts as prompts
 def get_league(league_id: int = const.SPACEJAM_LEAGUE_ID, year: int = const.YEAR) -> League:
     """Get the league object for the specified league_id and year."""
     league = League(league_id, year)
-    league.teams = {team.team_name: team for team in league.teams}
+    league.team_dict = {team.team_name: team for team in league.teams}
     return league
 
 
 def get_league_all_raw_stats_df(league: League) -> pd.DataFrame:
     """Get every team's stats for all categories."""
     league_stats = []
-    for team in league.teams.values():
+    for team in league.team_dict.values():
         temp_dict = deepcopy(team.stats)
         temp_dict["Team"] = team.team_name
         temp_dict["Standing"] = team.standing
@@ -51,7 +51,7 @@ def get_league_all_raw_data_rankings(league: League) -> pd.DataFrame:
 def get_league_cat_raw_stats_df(league: League) -> pd.DataFrame:
     """Get every team's stats for only roto categories."""
     league_stats = []
-    for team in league.teams.values():
+    for team in league.team_dict.values():
         temp_dict = deepcopy(team.stats)
         temp_dict["Team"] = team.team_name
         temp_dict["Standing"] = team.standing
@@ -172,6 +172,32 @@ def get_teamviewer_joke(team_name):
     ]
     chat_completion = client.chat.completions.create(messages=prompt, model="llama3-8b-8192")
     return chat_completion.choices[0].message.content
+
+
+def get_league_box_scores(league: League):
+    """Get the matchups for the current week."""
+    box_scores = league.box_scores(league.currentMatchupPeriod)
+    return box_scores
+
+
+def get_matchup_score_df(matchup: Matchup):
+    """Get the score dataframe for a given matchup."""
+    home_team_name = matchup.home_team.team_abbrev
+    away_team_name = matchup.away_team.team_abbrev
+    home_df = (
+        pd.DataFrame(matchup.home_team_cats)
+        .T.drop(columns=["result"])
+        .rename(columns={"score": home_team_name})
+    )
+    away_df = (
+        pd.DataFrame(matchup.away_team_cats)
+        .T.drop(columns=["result"])
+        .rename(columns={"score": away_team_name})
+    )
+    combined_df = pd.concat([home_df, away_df], axis=1)
+    combined_df["Diff"] = combined_df[home_team_name] - combined_df[away_team_name]
+    combined_df = combined_df.astype(float).round(2)
+    return combined_df
 
 
 if __name__ == "__main__":

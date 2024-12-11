@@ -18,15 +18,19 @@ def update_league_data():
     return be.get_league()
 
 
-league_data = update_league_data()
 if "league_data" not in st.session_state:
+    league_data = update_league_data()
     st.session_state.league_data = league_data
-league_df = be.get_league_cat_data_rankings(league_data)
 if "league_df" not in st.session_state:
+    league_df = be.get_league_cat_data_rankings(league_data)
     st.session_state.league_df = league_df
-teams = [team.team_name for team in league_data.teams.values()]
 if "teams" not in st.session_state:
+    teams = [team.team_name for team in league_data.teams]
     st.session_state.teams = teams
+
+league_data = st.session_state.league_data
+teams = st.session_state.teams
+league_df = st.session_state.league_df
 
 # Sidebar for page selection
 st.sidebar.success("Welcome to the Spacejam Dashboard, written by the Tatums.")
