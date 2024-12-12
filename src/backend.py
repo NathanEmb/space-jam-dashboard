@@ -195,7 +195,9 @@ def get_matchup_score_df(matchup: Matchup):
         .rename(columns={"score": away_team_name})
     )
     combined_df = pd.concat([home_df, away_df], axis=1)
-    combined_df["Diff"] = combined_df[home_team_name] - combined_df[away_team_name]
+    combined_df[f"{home_team_name}-{away_team_name}"] = (
+        combined_df[home_team_name] - combined_df[away_team_name]
+    )
     combined_df = combined_df.astype(float).round(2)
     return combined_df
 

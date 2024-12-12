@@ -41,7 +41,7 @@ home_team, scores, away_team = st.columns(3)
 box_score = box_scores[match_index]
 
 with home_team:
-    st.header(f"**{box_score.home_team.team_name}** - {box_score.home_team.team_abbrev}")
+    st.subheader(f"**{box_score.home_team.team_name}** - {box_score.home_team.team_abbrev}")
     st.markdown(
         f"W-T-L: ({box_score.home_team.wins}-{box_score.home_team.ties}-{box_score.home_team.losses})"
     )
@@ -50,12 +50,14 @@ with scores:
     st.text("")
     st.text("")
 
-    st.header(f"{box_score.home_wins} - {box_score.home_ties} - {box_score.away_wins}")
+    st.subheader(f"{box_score.home_wins} - {box_score.home_ties} - {box_score.away_wins}")
 with away_team:
-    st.header(f"**{box_score.away_team.team_name}** - {box_score.away_team.team_abbrev}")
+    st.subheader(f"**{box_score.away_team.team_name}** - {box_score.away_team.team_abbrev}")
     st.markdown(
         f"W-T-L: ({box_score.away_team.wins}-{box_score.away_team.ties}-{box_score.away_team.losses})"
     )
 
 st.header("H2H Scores", divider=True)
-st.dataframe(be.get_matchup_score_df(league_data.scoreboard()[match_index]))
+st.dataframe(
+    be.get_matchup_score_df(league_data.scoreboard()[match_index]), use_container_width=True
+)
