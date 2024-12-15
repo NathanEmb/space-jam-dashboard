@@ -32,11 +32,8 @@ league_data = st.session_state.league_data
 teams = st.session_state.teams
 league_df = st.session_state.league_df
 
-st.sidebar.subheader("And now, a joke powered by AI 🤖")
-
 st.title(const.TEAM_PAGE_TITLE)
 chosen_team = st.selectbox("Team", teams)
-st.sidebar.write(be.get_teamviewer_joke(chosen_team))
 team_data = league_data.team_dict[chosen_team]
 seven_day_stats = be.get_average_team_stats(team_data, 7)
 fifteen_day_stats = be.get_average_team_stats(team_data, 15)
