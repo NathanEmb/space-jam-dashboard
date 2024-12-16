@@ -64,8 +64,9 @@ matchup_input = html.MatchupInput(
     box_score.home_ties,
     matchup_scores=agg_cat_scores,
 )
-components.html(html.get_matchup_html(matchup_input), height=5000)
+components.html(html.get_matchup_html(matchup_input), height=400)
 
 st.markdown(
     "This is basically just ESPN viewer right now...I get that. I'd like to add actual vs projected for the week + some information surrounding available players and how they might impact your matchup...but it's a lot of work."
 )
+st.markdown("if you say nice things maybe I'll do it.")
