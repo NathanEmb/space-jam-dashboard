@@ -8,6 +8,7 @@ TEAM_PAGE_TITLE = "Team Viewer"
 MATCHUP_PAGE_TITLE = "The Thunderdome"
 
 NINE_CATS = ["PTS", "BLK", "STL", "AST", "REB", "TO", "3PM", "FG%", "FT%"]
+"""The 9 standard categories in fantasy basketball."""
 
 ALL_RAW_DATA_TABLE_DEF = {
     "Team": str,
@@ -76,7 +77,10 @@ CAT_ONLY_DATA_RANKED_TABLE_DEF = {
 }
 
 WANT_BIG_NUM = ["PTS", "BLK", "STL", "AST", "REB", "FGM", "FGA", "FTM", "FTA", "3PM", "FG%", "FT%"]
+"""All stats where a big number is better."""
 
 WANT_BIG_NUM_CATS = ["PTS", "BLK", "STL", "AST", "REB", "3PM", "FG%", "FT%"]
+"""Roto Categories where a big number is better."""
 
 WANT_SMALL_NUM = ["Standing", "TO"]
+"""All stats where a small number is better."""

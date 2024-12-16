@@ -6,7 +6,16 @@ import src.backend as be
 
 # App configuration
 icon_url = "https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg"
-st.set_page_config(layout="wide", page_title="Spacejam Dashboard", page_icon=icon_url)
+st.set_page_config(
+    page_title="Spacejam Dashboard",
+    page_icon=icon_url,
+    menu_items={
+        "Get Help": "https://www.extremelycoolapp.com/help",
+        "Report a bug": "https://www.extremelycoolapp.com/bug",
+        "About": "# This is a header. This is an *extremely* cool app!",
+},
+)
+
 st.logo(icon_url, size="large")
 refresh_in_sec = 600
 count = st_autorefresh(interval=refresh_in_sec * 1000, limit=100, key="statscounter")
@@ -18,15 +27,19 @@ def update_league_data():
     return be.get_league()
 
 
-league_data = update_league_data()
 if "league_data" not in st.session_state:
+    league_data = update_league_data()
     st.session_state.league_data = league_data
-league_df = be.get_league_cat_data_rankings(league_data)
 if "league_df" not in st.session_state:
+    league_df = be.get_league_cat_data_rankings(league_data)
     st.session_state.league_df = league_df
-teams = [team.team_name for team in league_data.teams.values()]
 if "teams" not in st.session_state:
+    teams = [team.team_name for team in league_data.teams]
     st.session_state.teams = teams
+
+league_data = st.session_state.league_data
+teams = st.session_state.teams
+league_df = st.session_state.league_df
 
 # Sidebar for page selection
 st.sidebar.success("Welcome to the Spacejam Dashboard, written by the Tatums.")
