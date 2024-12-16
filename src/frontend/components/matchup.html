@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Basketball Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: fit-content;
+            background-color: #0E1117;
+            color: white;
+        }
+
+        .score-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: #262730;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            width: 80%;
+            margin-bottom: 1px;
+            color: white;
+        }
+
+        .team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .team img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 8px;
+        }
+
+        .team-name {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            word-wrap: break-word;
+        }
+
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            white-space: nowrap;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 0px;
+            background: rgba(224, 128, 38, 0.819);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 16px;
+            width: 80%;
+            border-top: 1px solid rgba(224, 128, 38, 0.819);
+        }
+
+
+        table th, table td {
+            padding: 6px;
+            text-align: center;
+            border-bottom: 1px solid #0907078e;
+            border-left: 1px solid #0907071e;
+        }
+        table th img {
+            width: 50px; /* Set a consistent width */
+            height: 50px; /* Set a consistent height */
+            object-fit: cover; /* Ensure proper aspect ratio */
+        }
+
+        .highlight {
+        background-color: rgb(230, 131, 39);;
+        font-weight: bold;
+    }
+        .highlight-black {
+            background-color: #262730;
+        }
+
+
+        @media (max-width: 480px) {
+            .score-card {
+                flex-direction: row;
+                text-align: center;
+                padding: 4px;
+                width: 95%;
+            }
+
+            .team img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .team-name {
+                font-size: 14px;
+            }
+
+            .score {
+                font-size: 18px;
+            }
+
+            table {
+                width: 95%;
+            }
+
+            /* table th, table td {
+                padding: 8px;
+            } */
+        }
+    </style>
+</head>
+<body>
+    <div class="score-card">
+        <div class="team">
+            <img src="{{ home_logo }}" alt="Team 1 Logo">
+            <div class="team-name">{{ home_team }}</div>
+        </div>
+        <div class="score">{{ wins }} - {{ ties }} - {{ losses }}</div>
+        <div class="team">
+            <img src="{{ away_logo }}" alt="Team 2 Logo">
+            <div class="team-name">{{ away_team }}</div>
+        </div>
+    </div>
+    <table>
+        <tbody>
+            {% for category in matchup_scores %}
+            <tr>
+                <td 
+                    class="{% if (category.name == 'TO' and category.home < category.away) or (category.name != 'TO' and category.home > category.away) %}highlight{% endif %}">
+                    {{ category.home }}
+                </td>
+                <td class="highlight-black">{{ category.name }}</td>
+                <td 
+                    class="{% if (category.name == 'TO' and category.away < category.home) or (category.name != 'TO' and category.away > category.home) %}highlight{% endif %}">
+                    {{ category.away }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</body>
+</html>

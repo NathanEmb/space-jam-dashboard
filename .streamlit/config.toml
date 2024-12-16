@@ -1,0 +1,16 @@
+[client]
+showErrorDetails = "none"
+#toolbarMode = "viewer"
+
+[logger]
+level = "info"
+messageFormat = "%(asctime)s %(message)s"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base="dark"

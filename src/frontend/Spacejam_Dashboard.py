@@ -6,7 +6,16 @@ import src.backend as be
 
 # App configuration
 icon_url = "https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg"
-st.set_page_config(layout="wide", page_title="Spacejam Dashboard", page_icon=icon_url)
+st.set_page_config(
+    page_title="Spacejam Dashboard",
+    page_icon=icon_url,
+    menu_items={
+        "Get Help": "https://www.extremelycoolapp.com/help",
+        "Report a bug": "https://www.extremelycoolapp.com/bug",
+        "About": "# This is a header. This is an *extremely* cool app!",
+},
+)
+
 st.logo(icon_url, size="large")
 refresh_in_sec = 600
 count = st_autorefresh(interval=refresh_in_sec * 1000, limit=100, key="statscounter")

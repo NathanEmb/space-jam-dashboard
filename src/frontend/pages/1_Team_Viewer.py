@@ -8,7 +8,7 @@ import src.frontend.streamlit_utils as su
 
 # App configuration
 icon_url = "https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg"
-st.set_page_config(layout="wide", page_title="Team Viewer", page_icon=icon_url)
+st.set_page_config(page_title="Team Viewer", page_icon=icon_url)
 st.logo(icon_url, size="large")
 
 
@@ -16,6 +16,7 @@ st.logo(icon_url, size="large")
 @st.cache_data
 def update_league_data():
     return be.get_league()
+
 
 if "league_data" not in st.session_state:
     league_data = update_league_data()
@@ -51,25 +52,21 @@ with acquisitions_col:
     st.metric("Total Acquisitions Used:", f"{team_obj.acquisitions} / 70")
 
 st.header("Category Rankings")
-left_col, mid_col, right_col = st.columns(3)
 team_data = league_df.loc[league_df["Team"] == chosen_team].to_dict("records")[0]
 strengths, weaknesses, punts = be.get_team_breakdown(team_data)
 
-num_cats_per_row = 3
-with left_col:
-    st.subheader("Team Strengths")
-    st.markdown("Team ranks in top 4 of these categories.")
-    su.create_metric_grid(strengths, num_cats_per_row)
+num_cats_per_row = 2
+st.subheader("Team Strengths")
+st.markdown("Team ranks in top 4 of these categories.")
+su.create_metric_grid(strengths, num_cats_per_row)
 
-with mid_col:
-    st.subheader("Could go either way")
-    st.markdown("Team ranks in middle 4 of these categories.")
-    su.create_metric_grid(weaknesses, num_cats_per_row)
+st.subheader("Could go either way")
+st.markdown("Team ranks in middle 4 of these categories.")
+su.create_metric_grid(weaknesses, num_cats_per_row)
 
-with right_col:
-    st.subheader("Team Punts")
-    st.markdown("Team ranks in bottom 4 of league in these categories. (hopefully on purpose)")
-    su.create_metric_grid(punts, num_cats_per_row)
+st.subheader("Team Punts")
+st.markdown("Team ranks in bottom 4 of league in these categories. (hopefully on purpose)")
+su.create_metric_grid(punts, num_cats_per_row)
 
 with st.expander("🏀 Individual Player Stats"):
     timeframe = st.radio("Past:", ["7 Days", "15 Days", "30 Days"], horizontal=True)
