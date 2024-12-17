@@ -1,6 +1,6 @@
 [client]
 showErrorDetails = "none"
-#toolbarMode = "viewer"
+toolbarMode = "viewer"
 
 [logger]
 level = "info"
