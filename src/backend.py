@@ -121,17 +121,17 @@ def get_team_breakdown(team_cat_ranks: dict) -> tuple[dict, dict, dict]:
         strengths (list): The categories in which the team excels.
         weaknesses (list): The categories in which the team is average.
         punts (list): The categories in which the team is weak."""
-    strengths = {}
-    weaknesses = {}
-    punts = {}
+    strengths = []
+    weaknesses = []
+    punts = []
 
     for cat in const.NINE_CATS:
         if team_cat_ranks[cat] <= 4:
-            strengths[cat] = team_cat_ranks[cat]
+            strengths.append({"label": cat, "value": team_cat_ranks[cat]})
         elif team_cat_ranks[cat] >= 8:
-            punts[cat] = team_cat_ranks[cat]
+            punts.append({"label": cat, "value": team_cat_ranks[cat]})
         else:
-            weaknesses[cat] = team_cat_ranks[cat]
+            weaknesses.append({"label": cat, "value": team_cat_ranks[cat]})
     return strengths, weaknesses, punts
 
 

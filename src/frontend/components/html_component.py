@@ -28,3 +28,10 @@ def get_matchup_html(data: MatchupInput):
         ties=data.ties,
         matchup_scores=data.matchup_scores,
     )
+
+
+def get_team_viewer_html(data):
+    with open("src/frontend/components/team_viewer.html", "r") as f:
+        template = Template(f.read())
+
+    return template.render(metrics=data)
