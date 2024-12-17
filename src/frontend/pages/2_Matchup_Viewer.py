@@ -5,28 +5,9 @@ from espn_api.basketball.box_score import H2HCategoryBoxScore
 import src.backend as be
 import src.constants as const
 import src.frontend.components.html_component as html
+from src.frontend.streamlit_utils import page_setup
 
-# App configuration
-icon_url = "https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg"
-st.set_page_config(layout="wide", page_title="Matchup Viewer", page_icon=icon_url)
-st.logo(icon_url, size="large")
-
-
-# Cached data behind it all
-@st.cache_data
-def update_league_data():
-    return be.get_league()
-
-
-if "league_data" not in st.session_state:
-    league_data = update_league_data()
-    st.session_state.league_data = league_data
-if "league_df" not in st.session_state:
-    league_df = be.get_league_cat_data_rankings(league_data)
-    st.session_state.league_df = league_df
-if "teams" not in st.session_state:
-    teams = [team.team_name for team in league_data.team_dict.values()]
-    st.session_state.teams = teams
+page_setup()
 
 league_data = st.session_state.league_data
 teams = st.session_state.teams
@@ -40,7 +21,7 @@ box_scores_formatted = [
 ]
 
 
-selected_match = st.sidebar.selectbox("Matches", box_scores_formatted)
+selected_match = st.sidebar.radio("Matches", box_scores_formatted)
 match_index = box_scores_formatted.index(selected_match)
 
 box_score = box_scores[match_index]

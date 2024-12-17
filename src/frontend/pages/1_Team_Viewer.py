@@ -4,37 +4,18 @@ from espn_api.basketball import Team
 import src.backend as be
 import src.constants as const
 import src.frontend.figures as fig
-import src.frontend.streamlit_utils as su
+from src.frontend.components.html_component import get_team_viewer_html
+from src.frontend.streamlit_utils import page_setup
 
-# App configuration
-icon_url = "https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg"
-st.set_page_config(page_title="Team Viewer", page_icon=icon_url)
-st.logo(icon_url, size="large")
-
-
-# Cached data behind it all
-@st.cache_data
-def update_league_data():
-    return be.get_league()
-
-
-if "league_data" not in st.session_state:
-    league_data = update_league_data()
-    st.session_state.league_data = league_data
-if "league_df" not in st.session_state:
-    league_df = be.get_league_cat_data_rankings(league_data)
-    st.session_state.league_df = league_df
-if "teams" not in st.session_state:
-    teams = [team.team_name for team in league_data.team_dict.values()]
-    st.session_state.teams = teams
+page_setup()
 
 
 league_data = st.session_state.league_data
 teams = st.session_state.teams
 league_df = st.session_state.league_df
 
-st.title(const.TEAM_PAGE_TITLE)
-chosen_team = st.selectbox("Team", teams)
+chosen_team = st.sidebar.radio("Team", teams)
+st.title(chosen_team)
 team_data = league_data.team_dict[chosen_team]
 seven_day_stats = be.get_average_team_stats(team_data, 7)
 fifteen_day_stats = be.get_average_team_stats(team_data, 15)
@@ -55,18 +36,17 @@ st.header("Category Rankings")
 team_data = league_df.loc[league_df["Team"] == chosen_team].to_dict("records")[0]
 strengths, weaknesses, punts = be.get_team_breakdown(team_data)
 
-num_cats_per_row = 2
 st.subheader("Team Strengths")
 st.markdown("Team ranks in top 4 of these categories.")
-su.create_metric_grid(strengths, num_cats_per_row)
+st.html(get_team_viewer_html(strengths))
 
 st.subheader("Could go either way")
 st.markdown("Team ranks in middle 4 of these categories.")
-su.create_metric_grid(weaknesses, num_cats_per_row)
+st.html(get_team_viewer_html(weaknesses))
 
 st.subheader("Team Punts")
 st.markdown("Team ranks in bottom 4 of league in these categories. (hopefully on purpose)")
-su.create_metric_grid(punts, num_cats_per_row)
+st.html(get_team_viewer_html(punts))
 
 with st.expander("🏀 Individual Player Stats"):
     timeframe = st.radio("Past:", ["7 Days", "15 Days", "30 Days"], horizontal=True)
