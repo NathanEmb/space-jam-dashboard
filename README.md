@@ -10,7 +10,7 @@ This project gets data from [espn-api](https://github.com/cwendt94/espn-api)  to
 
 ## Contributing
 ### Bug Report or Feature Request
-If you have requested features or bugs to report please use [GitHub Issues](https://github.com/NathanEmb/space-jam-dashboard)
+If you have requested features or bugs to report please use [GitHub Issues](https://github.com/NathanEmb/space-jam-dashboard/issues)
 
 ### Code your own
 This project uses [UV](https://github.com/astral-sh/uv) as the dependency manager and uses [Ruff](https://github.com/astral-sh/ruff) for linting and formatting. These rules are enforced on all Pull Requests. I recommend using a pre-commit hook or an IDE extension like [this](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
