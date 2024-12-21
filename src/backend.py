@@ -31,38 +31,6 @@ def get_league_all_raw_stats_df(league: League) -> pd.DataFrame:
     return df[list(const.ALL_RAW_DATA_TABLE_DEF.keys())].sort_values(by="Standing")
 
 
-def get_league_all_raw_data_rankings(league: League) -> pd.DataFrame:
-    """Get every team's ranking for all stats."""
-    raw_stats_df = get_league_all_raw_stats_df(league)
-    # Rank only numeric columns
-    want_big_num_df = raw_stats_df[const.WANT_BIG_NUM]
-    want_small_num_df = raw_stats_df[const.WANT_SMALL_NUM]
-    want_big_ranked_df = want_big_num_df.rank(ascending=False).astype(int)
-    want_small_ranked_df = want_small_num_df.rank(ascending=True).astype(int)
-    ranked_df = pd.concat([want_big_ranked_df, want_small_ranked_df], axis=1)
-    ranked_df["Avg. Cat. Rank"] = ranked_df.mean(axis=1)
-
-    # Concatenate with non-numeric columns
-    ranked_df = pd.concat([ranked_df, raw_stats_df.select_dtypes(exclude="number")], axis=1)
-
-    return ranked_df[list(const.ALL_DATA_RANKED_TABLE_DEF.keys())].sort_values(by="Standing")
-
-
-def get_league_cat_raw_stats_df(league: League) -> pd.DataFrame:
-    """Get every team's stats for only roto categories."""
-    league_stats = []
-    for team in league.team_dict.values():
-        temp_dict = deepcopy(team.stats)
-        temp_dict["Team"] = team.team_name
-        temp_dict["Standing"] = team.standing
-        league_stats.append(temp_dict)
-
-    df = pd.DataFrame(league_stats)
-
-    df = df.astype(const.CAT_ONLY_RAW_DATA_TABLE_DEF)
-    return df[list(const.CAT_ONLY_RAW_DATA_TABLE_DEF.keys())].sort_values(by="Standing")
-
-
 def get_league_cat_data_rankings(league: League) -> pd.DataFrame:
     """Get every team's ranking for only roto categories."""
     raw_stats_df = get_league_all_raw_stats_df(league)
@@ -158,48 +126,12 @@ def get_mainpage_joke():
     return chat_completion.choices[0].message.content
 
 
-def get_teamviewer_joke(team_name):
-    client = Groq()
-    prompt = [
-        {
-            "role": "system",
-            "content": "Be a witty and kind of offensive when responding. Speak as an expert on fantasy basketball. Don't repeat yourself, and make sure to keep your sentences fresh.",
-        },
-        {
-            "role": "user",
-            "content": f"Roast the team name choice of: '{team_name}'. Limit response to 100 characters",
-        },
-    ]
-    chat_completion = client.chat.completions.create(messages=prompt, model="llama3-8b-8192")
-    return chat_completion.choices[0].message.content
-
-
 def get_league_box_scores(league: League):
     """Get the matchups for the current week."""
     box_scores = league.box_scores(league.currentMatchupPeriod)
     return box_scores
 
 
-def get_matchup_score_df(matchup: Matchup):
-    """Get the score dataframe for a given matchup."""
-    home_team_name = matchup.home_team.team_abbrev
-    away_team_name = matchup.away_team.team_abbrev
-    home_df = (
-        pd.DataFrame(matchup.home_team_cats)
-        .T.drop(columns=["result"])
-        .rename(columns={"score": home_team_name})
-    )
-    away_df = (
-        pd.DataFrame(matchup.away_team_cats)
-        .T.drop(columns=["result"])
-        .rename(columns={"score": away_team_name})
-    )
-    combined_df = pd.concat([home_df, away_df], axis=1)
-    combined_df[f"{home_team_name}-{away_team_name}"] = (
-        combined_df[home_team_name] - combined_df[away_team_name]
-    )
-    combined_df = combined_df.astype(float).round(2)
-    return combined_df
 
 
 if __name__ == "__main__":
