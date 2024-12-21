@@ -1,6 +1,6 @@
 # Space Jammers
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-![Deployment](https://github.com/NathanEmb/space-jam-dashboard/blob/main/.github/workflows/deploy.yaml/badge.svg)
+[!![Deployment](https://github.com/NathanEmb/space-jam-dashboard/blob/main/.github/workflows/deploy.yaml/badge.svg)]
 [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/1pkz4.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 
 Web dashboard for the Space Jam fantasy basketball league. It is currently hosted at https://space-jammers.com! The goal is tor 
