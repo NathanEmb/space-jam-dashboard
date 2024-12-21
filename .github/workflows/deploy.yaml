@@ -1,4 +1,4 @@
-name: CD
+name: BuildAndDeploy
 
 on:
   push:
