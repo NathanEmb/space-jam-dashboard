@@ -170,7 +170,7 @@ def get_teamviewer_joke(team_name):
             "content": f"Roast the team name choice of: '{team_name}'. Limit response to 100 characters",
         },
     ]
-    chat_completion = client.chat.completions.create(messages=prompt, model="llama3-8b-8192")
+    chat_completion = client.chat.completions.create(messages=prompt, model="llama-3.1-8b-instant")
     return chat_completion.choices[0].message.content
 
 
