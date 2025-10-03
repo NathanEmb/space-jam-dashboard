@@ -13,7 +13,10 @@ league_df = st.session_state.league_df
 # Sidebar for page selection
 st.sidebar.success("Welcome to the Space Jammers Lounge, written by the Tatums.")
 st.sidebar.subheader("And now, a joke powered by AI 🤖")
-st.sidebar.write(be.get_mainpage_joke())
+try:
+    st.sidebar.write(be.get_mainpage_joke())
+except Exception:
+    st.sidebar.write("The bots broke..")
 
 # Main Page content
 st.title("Space Jammers Lounge")

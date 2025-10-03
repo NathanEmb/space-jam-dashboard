@@ -154,7 +154,7 @@ def get_prompt(prompt_map: dict):
 def get_mainpage_joke():
     client = Groq()
     prompt = get_prompt(prompts.mainpage_prompt_map)
-    chat_completion = client.chat.completions.create(messages=prompt, model="llama3-8b-8192")
+    chat_completion = client.chat.completions.create(messages=prompt, model="llama-3.1-8b-instant")
     return chat_completion.choices[0].message.content
 
 
