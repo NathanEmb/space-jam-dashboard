@@ -54,11 +54,11 @@ with st.expander("🏀 Individual Player Stats"):
         "Column Filter", options=seven_day_stats.columns, default=const.NINE_CATS
     )
     if timeframe == "7 Days":
-        st.dataframe(seven_day_stats[show_cols], use_container_width=True)
+        st.dataframe(seven_day_stats[show_cols], width="stretch")
     elif timeframe == "15 Days":
-        st.dataframe(fifteen_day_stats[show_cols], use_container_width=True)
+        st.dataframe(fifteen_day_stats[show_cols], width="stretch")
     elif timeframe == "30 Days":
-        st.dataframe(thirty_day_stats[show_cols], use_container_width=True)
+        st.dataframe(thirty_day_stats[show_cols], use_container_width="stretch")
 
 with st.expander("📊 Team Category Trends"):
     st.write("Team Trends - ", chosen_team)
