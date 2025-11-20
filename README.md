@@ -9,7 +9,6 @@ This project provides a dashboard for a fantasy basketball league (Space Jammers
 - Team statistics and category rankings
 - Player performance metrics across different timeframes (7, 15, 30 days)
 - Head-to-head matchup comparisons
-- AI-generated witty commentary (using Groq's LLM API)
 
 ## Architecture
 
@@ -78,4 +77,3 @@ Deployment to AWS is automated via GitHub Actions upon completion of a Pull Requ
 1. Follow the existing code structure and style
 2. Use appropriate docstrings for new functions
 3. Test your changes locally before submitting PRs
-4. Keep the witty spirit of the application in any new features
