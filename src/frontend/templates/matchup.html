@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Week {{ current_week }} - Matchup Viewer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Mobile-first matchup viewer */
+    .back-link {
+        display: inline-block;
+        color: #3B82F6;
+        text-decoration: none;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-banner {
+        background-color: #1E4E7E;
+        border-left: 4px solid #3B82F6;
+        padding: 0.75rem;
+        margin-bottom: 1.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    /* Matchup selector - mobile friendly */
+    .matchup-selector {
+        background-color: #1E1E1E;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .matchup-selector h3 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        color: #FF4B4B;
+    }
+
+    .matchup-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .matchup-option {
+        display: block;
+        padding: 0.75rem;
+        background-color: #262730;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #FAFAFA;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .matchup-option:hover {
+        background-color: #2A2A2A;
+        border-color: #FF4B4B;
+    }
+
+    .matchup-option.active {
+        background-color: #FF4B4B;
+        border-color: #FF4B4B;
+        font-weight: 600;
+    }
+
+    /* Score card - mobile optimized */
+    .score-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        background: #262730;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+    }
+
+    .team img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 0.5rem;
+        border: 2px solid #FF4B4B;
+    }
+
+    .team-name {
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-align: center;
+        word-wrap: break-word;
+        max-width: 100%;
+    }
+
+    .score {
+        font-size: 1.5rem;
+        font-weight: bold;
+        white-space: nowrap;
+        text-align: center;
+        flex-shrink: 0;
+        color: #FF4B4B;
+    }
+
+    /* Category scores table */
+    .category-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(224, 128, 38, 0.819);
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .category-table th,
+    .category-table td {
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(9, 7, 7, 0.55);
+        font-size: 0.9rem;
+    }
+
+    .category-table th {
+        background-color: #262730;
+        font-weight: 600;
+        color: #FAFAFA;
+    }
+
+    .category-name {
+        background-color: #262730;
+        font-weight: 600;
+        color: #FAFAFA;
+    }
+
+    .highlight {
+        background-color: rgb(230, 131, 39);
+        font-weight: bold;
+    }
+
+    /* Expandable selector for mobile */
+    .mobile-selector {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 1.25rem;
+        }
+
+        .score-card {
+            padding: 0.75rem;
+            gap: 0.75rem;
+        }
+
+        .team img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .team-name {
+            font-size: 0.8rem;
+        }
+
+        .score {
+            font-size: 1.25rem;
+        }
+
+        .category-table th,
+        .category-table td {
+            padding: 0.5rem 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        /* Show mobile selector, hide desktop list */
+        .mobile-selector {
+            display: block;
+        }
+
+        .desktop-selector {
+            display: none;
+        }
+
+        .matchup-selector select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #262730;
+            color: #FAFAFA;
+            border: 2px solid #FF4B4B;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .score-card {
+            padding: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .team img {
+            width: 35px;
+            height: 35px;
+        }
+
+        .team-name {
+            font-size: 0.7rem;
+        }
+
+        .score {
+            font-size: 1rem;
+        }
+
+        .category-table th,
+        .category-table td {
+            padding: 0.4rem 0.2rem;
+            font-size: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <a href="/" class="back-link">← Back to Dashboard</a>
+
+    <div class="page-header">
+        <h1>⚔️ Week {{ current_week }} - Matchup Viewer</h1>
+        <p style="font-size: 0.9rem; color: #888;">Select a matchup to view head-to-head stats</p>
+    </div>
+
+    <div class="info-banner">
+        ℹ️ Matchup stats are updated once daily in the early morning
+    </div>
+
+    <div class="matchup-selector">
+        <h3>📋 Select Matchup</h3>
+        
+        <!-- Mobile dropdown selector -->
+        <div class="mobile-selector">
+            <select onchange="window.location.href='/matchup/' + this.value">
+                {% for matchup in matchups %}
+                <option value="{{ matchup.index }}" {% if matchup.index == selected_index %}selected{% endif %}>
+                    {{ matchup.label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Desktop list selector -->
+        <div class="matchup-list desktop-selector">
+            {% for matchup in matchups %}
+            <a href="/matchup/{{ matchup.index }}" 
+               class="matchup-option {% if matchup.index == selected_index %}active{% endif %}">
+                {{ matchup.label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="score-card">
+        <div class="team">
+            <img src="{{ home_team.logo_url }}" alt="{{ home_team.team_name }} Logo">
+            <div class="team-name">{{ home_team.team_name }}</div>
+        </div>
+        <div class="score">{{ home_wins }} - {{ ties }} - {{ away_wins }}</div>
+        <div class="team">
+            <img src="{{ away_team.logo_url }}" alt="{{ away_team.team_name }} Logo">
+            <div class="team-name">{{ away_team.team_name }}</div>
+        </div>
+    </div>
+
+    <table class="category-table">
+        <thead>
+            <tr>
+                <th>{{ home_team.team_abbrev }}</th>
+                <th>Category</th>
+                <th>{{ away_team.team_abbrev }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in matchup_scores %}
+            <tr>
+                <td class="{% if (category.name == 'TO' and category.home < category.away) or (category.name != 'TO' and category.home > category.away) %}highlight{% endif %}">
+                    {{ category.home }}
+                </td>
+                <td class="category-name">{{ category.name }}</td>
+                <td class="{% if (category.name == 'TO' and category.away < category.home) or (category.name != 'TO' and category.away > category.home) %}highlight{% endif %}">
+                    {{ category.away }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 1.5rem; padding: 1rem; background-color: #1E1E1E; border-radius: 8px;">
+        <h3>💡 How to Read</h3>
+        <ul style="color: #888; font-size: 0.85rem; line-height: 1.8; padding-left: 1.5rem;">
+            <li><strong style="color: rgb(230, 131, 39);">Highlighted cells</strong> show the winning stat for that category</li>
+            <li>For <strong>TO (Turnovers)</strong>, lower is better</li>
+            <li>The middle score shows <strong>Wins - Ties - Losses</strong></li>
+            <li>Stats are season totals for the current matchup period</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

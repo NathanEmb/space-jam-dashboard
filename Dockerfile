@@ -10,4 +10,4 @@ ENV PYTHONPATH=.
 
 RUN uv sync --frozen 
 
-CMD ["uv", "run",  "streamlit", "run", "src/frontend/Spacejam_Dashboard.py", "--server.port", "5006" ] 
+CMD ["uv", "run",  "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "5006"] 

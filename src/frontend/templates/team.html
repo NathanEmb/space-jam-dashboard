@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team_name }} - Team Viewer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Mobile-first team viewer */
+    .back-link {
+        display: inline-block;
+        color: #3B82F6;
+        text-decoration: none;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .team-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .team-header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .ai-joke {
+        background-color: #262730;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border-left: 4px solid #FF4B4B;
+        font-style: italic;
+        color: #CCCCCC;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Team stats grid - mobile optimized */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background-color: #1E1E1E;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid #333;
+    }
+
+    .stat-label {
+        color: #888;
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        color: #FAFAFA;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    /* Category sections */
+    .category-section {
+        margin-bottom: 2rem;
+    }
+
+    .category-section h3 {
+        color: #FF4B4B;
+        margin-bottom: 0.5rem;
+    }
+
+    .category-description {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Metric grid for strengths/weaknesses/punts */
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .metric-item {
+        background: rgba(224, 128, 38, 0.819);
+        border-radius: 8px;
+        padding: 0.75rem;
+        text-align: center;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .metric-value {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        opacity: 0.9;
+    }
+
+    /* Expandable sections */
+    .expandable {
+        background-color: #1E1E1E;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .expandable-header {
+        padding: 1rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #262730;
+        user-select: none;
+    }
+
+    .expandable-header:hover {
+        background-color: #2A2A2A;
+    }
+
+    .expandable-icon {
+        transition: transform 0.3s;
+    }
+
+    .expandable-icon.open {
+        transform: rotate(180deg);
+    }
+
+    .expandable-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        padding: 0 1rem;
+    }
+
+    .expandable-content.open {
+        max-height: 2000px;
+        padding: 1rem;
+    }
+
+    /* Player stats table */
+    .stats-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        justify-content: center;
+    }
+
+    .stats-controls button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        background-color: #262730;
+        color: #FAFAFA;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background-color 0.3s;
+    }
+
+    .stats-controls button.active {
+        background-color: #FF4B4B;
+    }
+
+    .stats-controls button:hover {
+        background-color: #FF4B4B;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+    }
+
+    .player-table {
+        width: 100%;
+        min-width: 400px;
+        border-collapse: collapse;
+        background-color: #1E1E1E;
+    }
+
+    .player-table th {
+        position: sticky;
+        top: 0;
+        background-color: #262730;
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        font-size: 0.75rem;
+        border-bottom: 2px solid #FF4B4B;
+        white-space: nowrap;
+    }
+
+    .player-table td {
+        padding: 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid #333;
+        font-size: 0.75rem;
+    }
+
+    .player-table td:first-child,
+    .player-table th:first-child {
+        text-align: left;
+        position: sticky;
+        left: 0;
+        background-color: #1E1E1E;
+        font-weight: 600;
+        min-width: 100px;
+    }
+
+    .player-table th:first-child {
+        background-color: #262730;
+        z-index: 11;
+    }
+
+    .player-table tr:hover {
+        background-color: #2A2A2A;
+    }
+
+    .player-table tr:hover td:first-child {
+        background-color: #2A2A2A;
+    }
+
+    /* Chart image */
+    .chart-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .chart-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .team-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .stat-card {
+            padding: 0.75rem;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+        }
+
+        .metric-grid {
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <a href="/" class="back-link">← Back to Dashboard</a>
+
+    <div class="team-header">
+        <h1>{{ team_name }}</h1>
+        <div class="ai-joke">
+            🤖 {{ team_joke }}
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Standing</div>
+            <div class="stat-value">{{ standing }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Division</div>
+            <div class="stat-value" style="font-size: 1rem;">{{ division }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Record</div>
+            <div class="stat-value" style="font-size: 1rem;">{{ wins }}W-{{ losses }}L-{{ ties }}T</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Acquisitions</div>
+            <div class="stat-value" style="font-size: 1rem;">{{ acquisitions }}/70</div>
+        </div>
+    </div>
+
+    <h2>📊 Category Rankings</h2>
+
+    <div class="category-section">
+        <h3>💪 Team Strengths</h3>
+        <p class="category-description">Top 4 rankings in the league</p>
+        {% if strengths %}
+        <div class="metric-grid">
+            {% for metric in strengths %}
+            <div class="metric-item">
+                <div class="metric-value">{{ metric.value }}</div>
+                <div class="metric-label">{{ metric.label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: #888; font-style: italic;">No dominant categories</p>
+        {% endif %}
+    </div>
+
+    <div class="category-section">
+        <h3>⚖️ Could Go Either Way</h3>
+        <p class="category-description">Middle 4 rankings</p>
+        {% if weaknesses %}
+        <div class="metric-grid">
+            {% for metric in weaknesses %}
+            <div class="metric-item">
+                <div class="metric-value">{{ metric.value }}</div>
+                <div class="metric-label">{{ metric.label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: #888; font-style: italic;">No average categories</p>
+        {% endif %}
+    </div>
+
+    <div class="category-section">
+        <h3>🚫 Team Punts</h3>
+        <p class="category-description">Bottom 4 rankings (hopefully on purpose)</p>
+        {% if punts %}
+        <div class="metric-grid">
+            {% for metric in punts %}
+            <div class="metric-item">
+                <div class="metric-value">{{ metric.value }}</div>
+                <div class="metric-label">{{ metric.label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: #888; font-style: italic;">No weak categories</p>
+        {% endif %}
+    </div>
+
+    <div class="expandable">
+        <div class="expandable-header" onclick="toggleExpandable('players')">
+            <h3 style="margin: 0;">🏀 Individual Player Stats</h3>
+            <span class="expandable-icon" id="players-icon">▼</span>
+        </div>
+        <div class="expandable-content" id="players-content">
+            <div class="stats-controls">
+                <button class="active" onclick="switchTimeframe('7')">7 Days</button>
+                <button onclick="switchTimeframe('15')">15 Days</button>
+                <button onclick="switchTimeframe('30')">30 Days</button>
+            </div>
+            <div class="table-container">
+                <table class="player-table" id="player-stats-table">
+                    <!-- Will be populated by JavaScript -->
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="expandable">
+        <div class="expandable-header" onclick="toggleExpandable('trends')">
+            <h3 style="margin: 0;">📈 Team Category Trends</h3>
+            <span class="expandable-icon" id="trends-icon">▼</span>
+        </div>
+        <div class="expandable-content" id="trends-content">
+            <p style="color: #888; margin-bottom: 1rem;">Team performance across different timeframes</p>
+            <div class="chart-container">
+                <img src="data:image/png;base64,{{ chart_img }}" alt="Team Trends Chart">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const playerData = {
+        '7': {{ seven_day_stats | tojson }},
+        '15': {{ fifteen_day_stats | tojson }},
+        '30': {{ thirty_day_stats | tojson }}
+    };
+    const nineCats = {{ nine_cats | tojson }};
+    let currentTimeframe = '7';
+    let currentColumns = nineCats;
+
+    function toggleExpandable(id) {
+        const content = document.getElementById(id + '-content');
+        const icon = document.getElementById(id + '-icon');
+        content.classList.toggle('open');
+        icon.classList.toggle('open');
+    }
+
+    function switchTimeframe(days) {
+        currentTimeframe = days;
+        // Update active button
+        document.querySelectorAll('.stats-controls button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        renderTable();
+    }
+
+    function renderTable() {
+        const data = playerData[currentTimeframe];
+        const players = Object.keys(data);
+        const table = document.getElementById('player-stats-table');
+        
+        let html = '<thead><tr><th>Player</th>';
+        currentColumns.forEach(col => {
+            html += `<th>${col}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        
+        players.forEach(player => {
+            html += `<tr><td>${player}</td>`;
+            currentColumns.forEach(col => {
+                const value = data[player][col] || 0;
+                html += `<td>${typeof value === 'number' ? value.toFixed(2) : value}</td>`;
+            });
+            html += '</tr>';
+        });
+        
+        html += '</tbody>';
+        table.innerHTML = html;
+    }
+
+    // Initial render
+    renderTable();
+</script>
+{% endblock %}

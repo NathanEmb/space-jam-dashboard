@@ -14,7 +14,8 @@ This project provides a dashboard for a fantasy basketball league (Space Jammers
 
 The application is built using:
 
-- [Streamlit](https://streamlit.io/) for the web frontend
+- [FastAPI](https://fastapi.tiangolo.com/) for the web backend and API
+- [HTML + CSS](https://developer.mozilla.org/en-US/docs/Web) for the mobile-friendly frontend
 - [ESPN API](https://github.com/cwendt94/espn-api) for fetching fantasy basketball data
 - [Pandas](https://pandas.pydata.org/) for data manipulation and analysis
 - [Matplotlib](https://matplotlib.org/) for data visualization
@@ -25,14 +26,12 @@ The project is containerized with Docker and deployed to AWS.
 
 ## Project Structure
 
+- `src/app.py` - FastAPI application with routing and API endpoints
 - `src/backend.py` - Core logic for data fetching and processing
 - `src/prompts.py` - Prompting for AI-generated content via Groq
-- `src/frontend/` - Streamlit pages and UI components
-  - `Spacejam_Dashboard.py` - Main dashboard entry point
+- `src/frontend/` - Frontend templates and components
+  - `templates/` - HTML templates for all pages
   - `figures.py` - Matplotlib visualization functions
-  - `streamlit_utils.py` - Utility functions for Streamlit UI
-  - `pages/` - Additional views (Team Viewer, Matchup Viewer)
-  - `components/` - Reusable UI components with HTML templates
 
 ## Features
 
@@ -40,10 +39,11 @@ The project is containerized with Docker and deployed to AWS.
 - **Team Viewer**: Detailed breakdown of individual team strengths, weaknesses, and trends
 - **Matchup Viewer**: Compare head-to-head matchups with detailed statistics
 - **AI Commentary**: Enjoy witty, sometimes snarky comments about teams and matchups
+- **Mobile-Friendly**: Optimized for mobile devices with responsive design and touch-friendly controls
 
 ## Development Setup
 
-1. Ensure you have Python 3.13 installed
+1. Ensure you have Python 3.12+ installed
 
 2. Install dependencies using UV (recommended) or pip:
    ```bash
@@ -54,8 +54,12 @@ The project is containerized with Docker and deployed to AWS.
 
 3. Run the application locally:
    ```bash
-   uv run streamlit run src/frontend/Spacejam_Dashboard.py
+   uv run uvicorn src.app:app --reload --port 5006
+   # OR
+   python -m uvicorn src.app:app --reload --port 5006
    ```
+
+4. Open your browser and navigate to `http://localhost:5006`
 
 ## Deployment
 
@@ -77,3 +81,4 @@ Deployment to AWS is automated via GitHub Actions upon completion of a Pull Requ
 1. Follow the existing code structure and style
 2. Use appropriate docstrings for new functions
 3. Test your changes locally before submitting PRs
+4. Ensure mobile responsiveness for any UI changes

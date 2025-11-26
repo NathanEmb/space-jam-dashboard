@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Space Jammers Dashboard - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Mobile-first design */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .welcome-section {
+        background-color: #1E1E1E;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .welcome-section h2 {
+        color: #FF4B4B;
+        margin-bottom: 1rem;
+    }
+
+    .ai-joke {
+        background-color: #262730;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #FF4B4B;
+        font-style: italic;
+        color: #CCCCCC;
+        margin-top: 1rem;
+    }
+
+    .section-header {
+        margin: 2rem 0 1rem 0;
+    }
+
+    .info-banner {
+        background-color: #1E4E7E;
+        border-left: 4px solid #3B82F6;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+    /* Table styling - mobile optimized */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+        background-color: #1E1E1E;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+        background-color: #262730;
+        z-index: 10;
+    }
+
+    th {
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        font-weight: 600;
+        border-bottom: 2px solid #FF4B4B;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid #333;
+        font-size: 0.85rem;
+    }
+
+    tr:hover {
+        background-color: #2A2A2A;
+    }
+
+    /* Team name column - left aligned and wider */
+    td:first-child,
+    th:first-child {
+        text-align: left;
+        position: sticky;
+        left: 0;
+        background-color: #1E1E1E;
+        font-weight: 600;
+        min-width: 120px;
+        padding-left: 1rem;
+    }
+
+    th:first-child {
+        background-color: #262730;
+        z-index: 11;
+    }
+
+    tr:hover td:first-child {
+        background-color: #2A2A2A;
+    }
+
+    /* Color coding for rankings - green is good */
+    .rank-excellent {
+        background-color: rgba(34, 197, 94, 0.2);
+        color: #4ADE80;
+        font-weight: 600;
+    }
+
+    .rank-good {
+        background-color: rgba(132, 204, 22, 0.2);
+        color: #A3E635;
+    }
+
+    .rank-average {
+        background-color: rgba(251, 191, 36, 0.2);
+        color: #FCD34D;
+    }
+
+    .rank-poor {
+        background-color: rgba(251, 146, 60, 0.2);
+        color: #FDBA74;
+    }
+
+    .rank-bad {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #F87171;
+        font-weight: 600;
+    }
+
+    /* Quick links for mobile */
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .quick-link {
+        background-color: #1E1E1E;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        color: #FAFAFA;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+
+    .quick-link:hover {
+        background-color: #FF4B4B;
+        border-color: #FF4B4B;
+        transform: translateY(-2px);
+    }
+
+    .quick-link-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+
+        th, td {
+            padding: 0.5rem 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        td:first-child,
+        th:first-child {
+            min-width: 100px;
+            padding-left: 0.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .quick-links {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        th, td {
+            font-size: 0.7rem;
+            padding: 0.4rem 0.2rem;
+        }
+
+        td:first-child,
+        th:first-child {
+            min-width: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="page-header">
+        <h1>🏀 Space Jammers Lounge</h1>
+        <p>Fantasy Basketball League Dashboard</p>
+    </div>
+
+    <div class="welcome-section">
+        <h2>Welcome to the Space Jammers Lounge</h2>
+        <p>Written by the Tatums</p>
+        <div class="ai-joke">
+            <strong>🤖 AI-Powered Joke:</strong><br>
+            {{ joke }}
+        </div>
+    </div>
+
+    <div class="quick-links">
+        <a href="#rankings" class="quick-link">
+            <div class="quick-link-icon">📊</div>
+            <div>Rankings</div>
+        </a>
+        <a href="/matchup/0" class="quick-link">
+            <div class="quick-link-icon">⚔️</div>
+            <div>Matchups</div>
+        </a>
+    </div>
+
+    <div id="rankings" class="section-header">
+        <h2>📊 Category Rankings</h2>
+        <p style="color: #4ADE80; margin-bottom: 0.5rem;">Green is good • Lower rank numbers are better</p>
+    </div>
+
+    <div class="info-banner">
+        ℹ️ On mobile, swipe left/right to see all categories. Rotate to landscape for better viewing.
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Standing</th>
+                    <th>Avg Rank</th>
+                    {% for col in columns[3:] %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in league_data %}
+                <tr>
+                    <td><a href="/team/{{ row.Team }}" style="color: #3B82F6; text-decoration: none;">{{ row.Team }}</a></td>
+                    <td class="{{ get_rank_class(row.Standing) }}">{{ row.Standing }}</td>
+                    <td class="{{ get_rank_class(row['Avg. Cat. Rank']) }}">{{ "%.1f"|format(row['Avg. Cat. Rank']) }}</td>
+                    {% for col in columns[3:] %}
+                    <td class="{{ get_rank_class(row[col]) }}">{{ row[col] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 2rem; padding: 1rem; background-color: #1E1E1E; border-radius: 8px;">
+        <h3>📱 About This Dashboard</h3>
+        <p>A site to lookup fantasy basketball rankings for Space Jammers league. Data is updated periodically throughout the day.</p>
+        <p style="margin-top: 0.5rem; color: #888; font-size: 0.85rem;">
+            Tap team names to view detailed stats • Swipe tables to see all data
+        </p>
+    </div>
+</div>
+
+<script>
+    function get_rank_class(rank) {
+        if (rank <= 2) return 'rank-excellent';
+        if (rank <= 4) return 'rank-good';
+        if (rank <= 6) return 'rank-average';
+        if (rank <= 8) return 'rank-poor';
+        return 'rank-bad';
+    }
+
+    // Apply rank classes to table cells
+    document.addEventListener('DOMContentLoaded', function() {
+        const cells = document.querySelectorAll('td');
+        cells.forEach(cell => {
+            const value = parseFloat(cell.textContent);
+            if (!isNaN(value) && value > 0 && value <= 12) {
+                cell.className = get_rank_class(value);
+            }
+        });
+    });
+</script>
+{% endblock %}
