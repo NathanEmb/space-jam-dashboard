@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Space Jammers Dashboard{% endblock %}</title>
     <link rel="icon" href="https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg">
+    <link rel="stylesheet" href="https://unpkg.com/@atlaskit/css-reset@6.5.0/dist/bundle.css">
+    <script src="https://unpkg.com/@atlaskit/icon@22.0.0/dist/index.js"></script>
     <style>
+        :root {
+            --primary-green: #8FBC8F;
+            --primary-green-dark: #6B9B6B;
+            --primary-green-light: #A8D5A8;
+            --secondary-silver: #C0C0C0;
+            --secondary-silver-dark: #A8A8A8;
+            --bg-dark: #1A1A1A;
+            --bg-card: #2A2A2A;
+            --text-primary: #FAFAFA;
+            --text-secondary: #CCCCCC;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,8 +28,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0E1117;
-            color: #FAFAFA;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
             line-height: 1.6;
         }
 
@@ -27,9 +41,10 @@
 
         /* Navigation */
         nav {
-            background-color: #262730;
+            background-color: var(--bg-card);
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border-bottom: 3px solid var(--primary-green);
         }
 
         .nav-content {
@@ -55,7 +70,7 @@
 
         .nav-logo h1 {
             font-size: 1.5rem;
-            color: #FF4B4B;
+            color: var(--primary-green);
         }
 
         .nav-links {
@@ -65,7 +80,7 @@
         }
 
         .nav-links a {
-            color: #FAFAFA;
+            color: var(--text-primary);
             text-decoration: none;
             padding: 0.5rem 1rem;
             border-radius: 4px;
@@ -73,19 +88,20 @@
         }
 
         .nav-links a:hover {
-            background-color: #FF4B4B;
+            background-color: var(--primary-green);
+            color: var(--bg-dark);
         }
 
         /* Sidebar */
         .sidebar {
-            background-color: #262730;
+            background-color: var(--bg-card);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .sidebar h3 {
-            color: #FF4B4B;
+            color: var(--primary-green);
             margin-bottom: 1rem;
         }
 
@@ -94,17 +110,17 @@
         }
 
         .sidebar-section h4 {
-            color: #FAFAFA;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
         }
 
         .sidebar-joke {
-            background-color: #1E1E1E;
+            background-color: var(--bg-dark);
             padding: 1rem;
             border-radius: 8px;
             font-style: italic;
-            color: #CCCCCC;
+            color: var(--text-secondary);
         }
 
         /* Team selector */
@@ -115,22 +131,23 @@
         }
 
         .team-selector a {
-            color: #FAFAFA;
+            color: var(--text-primary);
             text-decoration: none;
             padding: 0.5rem;
             border-radius: 4px;
-            background-color: #1E1E1E;
+            background-color: var(--bg-dark);
             transition: background-color 0.3s;
         }
 
         .team-selector a:hover,
         .team-selector a.active {
-            background-color: #FF4B4B;
+            background-color: var(--primary-green);
+            color: var(--bg-dark);
         }
 
         /* Main content */
         .main-content {
-            background-color: #262730;
+            background-color: var(--bg-card);
             border-radius: 12px;
             padding: 2rem;
         }
@@ -140,26 +157,33 @@
         }
 
         h1 {
-            color: #FF4B4B;
+            color: var(--primary-green);
             font-size: 2rem;
         }
 
         h2 {
-            color: #FAFAFA;
+            color: var(--text-primary);
             font-size: 1.5rem;
         }
 
         h3 {
-            color: #FAFAFA;
+            color: var(--text-primary);
             font-size: 1.2rem;
         }
 
         .info-box {
-            background-color: #1E4E7E;
-            border-left: 4px solid #3B82F6;
+            background-color: rgba(143, 188, 143, 0.2);
+            border-left: 4px solid var(--primary-green);
             padding: 1rem;
             margin: 1rem 0;
             border-radius: 4px;
+        }
+
+        /* Icon styling */
+        .icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
         }
 
         /* Responsive */

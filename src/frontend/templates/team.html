@@ -7,7 +7,7 @@
     /* Mobile-first team viewer */
     .back-link {
         display: inline-block;
-        color: #3B82F6;
+        color: var(--primary-green);
         text-decoration: none;
         margin-bottom: 1rem;
         font-size: 0.9rem;
@@ -28,12 +28,12 @@
     }
 
     .ai-joke {
-        background-color: #262730;
+        background-color: var(--bg-card);
         padding: 0.75rem;
         border-radius: 8px;
-        border-left: 4px solid #FF4B4B;
+        border-left: 4px solid var(--primary-green);
         font-style: italic;
-        color: #CCCCCC;
+        color: var(--text-secondary);
         margin-top: 1rem;
         font-size: 0.85rem;
     }
@@ -47,7 +47,7 @@
     }
 
     .stat-card {
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
         padding: 1rem;
         border-radius: 8px;
         text-align: center;
@@ -55,14 +55,14 @@
     }
 
     .stat-label {
-        color: #888;
+        color: var(--text-secondary);
         font-size: 0.75rem;
         margin-bottom: 0.25rem;
         text-transform: uppercase;
     }
 
     .stat-value {
-        color: #FAFAFA;
+        color: var(--text-primary);
         font-size: 1.5rem;
         font-weight: bold;
     }
@@ -73,12 +73,12 @@
     }
 
     .category-section h3 {
-        color: #FF4B4B;
+        color: var(--primary-green);
         margin-bottom: 0.5rem;
     }
 
     .category-description {
-        color: #888;
+        color: var(--text-secondary);
         font-size: 0.85rem;
         margin-bottom: 1rem;
     }
@@ -112,7 +112,7 @@
 
     /* Expandable sections */
     .expandable {
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
         border-radius: 8px;
         margin-bottom: 1rem;
         overflow: hidden;
@@ -124,7 +124,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #262730;
+        background-color: var(--bg-card);
         user-select: none;
     }
 
@@ -165,19 +165,19 @@
         padding: 0.5rem 1rem;
         border: none;
         border-radius: 4px;
-        background-color: #262730;
-        color: #FAFAFA;
+        background-color: var(--bg-card);
+        color: var(--text-primary);
         cursor: pointer;
         font-size: 0.85rem;
         transition: background-color 0.3s;
     }
 
     .stats-controls button.active {
-        background-color: #FF4B4B;
+        background-color: var(--primary-green);
     }
 
     .stats-controls button:hover {
-        background-color: #FF4B4B;
+        background-color: var(--primary-green);
     }
 
     .table-container {
@@ -190,17 +190,17 @@
         width: 100%;
         min-width: 400px;
         border-collapse: collapse;
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
     }
 
     .player-table th {
         position: sticky;
         top: 0;
-        background-color: #262730;
+        background-color: var(--bg-card);
         padding: 0.75rem 0.5rem;
         text-align: center;
         font-size: 0.75rem;
-        border-bottom: 2px solid #FF4B4B;
+        border-bottom: 2px solid var(--primary-green);
         white-space: nowrap;
     }
 
@@ -216,13 +216,13 @@
         text-align: left;
         position: sticky;
         left: 0;
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
         font-weight: 600;
         min-width: 100px;
     }
 
     .player-table th:first-child {
-        background-color: #262730;
+        background-color: var(--bg-card);
         z-index: 11;
     }
 
@@ -286,7 +286,7 @@
     <div class="team-header">
         <h1>{{ team_name }}</h1>
         <div class="ai-joke">
-            🤖 {{ team_joke }}
+            {{ team_joke }}
         </div>
     </div>
 
@@ -309,10 +309,10 @@
         </div>
     </div>
 
-    <h2>📊 Category Rankings</h2>
+    <h2>Category Rankings</h2>
 
     <div class="category-section">
-        <h3>💪 Team Strengths</h3>
+        <h3>Team Strengths</h3>
         <p class="category-description">Top 4 rankings in the league</p>
         {% if strengths %}
         <div class="metric-grid">
@@ -324,12 +324,12 @@
             {% endfor %}
         </div>
         {% else %}
-        <p style="color: #888; font-style: italic;">No dominant categories</p>
+        <p style="color: var(--text-secondary); font-style: italic;">No dominant categories</p>
         {% endif %}
     </div>
 
     <div class="category-section">
-        <h3>⚖️ Could Go Either Way</h3>
+        <h3>Could Go Either Way</h3>
         <p class="category-description">Middle 4 rankings</p>
         {% if weaknesses %}
         <div class="metric-grid">
@@ -341,12 +341,12 @@
             {% endfor %}
         </div>
         {% else %}
-        <p style="color: #888; font-style: italic;">No average categories</p>
+        <p style="color: var(--text-secondary); font-style: italic;">No average categories</p>
         {% endif %}
     </div>
 
     <div class="category-section">
-        <h3>🚫 Team Punts</h3>
+        <h3>Team Punts</h3>
         <p class="category-description">Bottom 4 rankings (hopefully on purpose)</p>
         {% if punts %}
         <div class="metric-grid">
@@ -358,13 +358,13 @@
             {% endfor %}
         </div>
         {% else %}
-        <p style="color: #888; font-style: italic;">No weak categories</p>
+        <p style="color: var(--text-secondary); font-style: italic;">No weak categories</p>
         {% endif %}
     </div>
 
     <div class="expandable">
         <div class="expandable-header" onclick="toggleExpandable('players')">
-            <h3 style="margin: 0;">🏀 Individual Player Stats</h3>
+            <h3 style="margin: 0;">Individual Player Stats</h3>
             <span class="expandable-icon" id="players-icon">▼</span>
         </div>
         <div class="expandable-content" id="players-content">
@@ -383,11 +383,11 @@
 
     <div class="expandable">
         <div class="expandable-header" onclick="toggleExpandable('trends')">
-            <h3 style="margin: 0;">📈 Team Category Trends</h3>
+            <h3 style="margin: 0;">Team Category Trends</h3>
             <span class="expandable-icon" id="trends-icon">▼</span>
         </div>
         <div class="expandable-content" id="trends-content">
-            <p style="color: #888; margin-bottom: 1rem;">Team performance across different timeframes</p>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Team performance across different timeframes</p>
             <div class="chart-container">
                 <img src="data:image/png;base64,{{ chart_img }}" alt="Team Trends Chart">
             </div>

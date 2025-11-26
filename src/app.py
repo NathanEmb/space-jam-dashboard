@@ -1,8 +1,10 @@
 """FastAPI application for Space Jammers Dashboard."""
 
+import asyncio
 import base64
 import io
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 import matplotlib
 
@@ -16,21 +18,46 @@ import src.backend as be
 import src.constants as const
 from src.frontend.figures import create_cat_bar_charts
 
-# Global data cache - loaded once at startup
+# Global data cache - refreshed hourly
 league_data = None
 league_df = None
 teams = None
+last_update = None
+
+
+async def refresh_league_data():
+    """Refresh league data from ESPN API."""
+    global league_data, league_df, teams, last_update
+    league_data = be.get_league()
+    league_df = be.get_league_cat_data_rankings(league_data)
+    teams = [team.team_name for team in league_data.teams]
+    last_update = datetime.now()
+
+
+async def periodic_refresh():
+    """Periodically refresh league data every hour."""
+    while True:
+        await asyncio.sleep(3600)  # Sleep for 1 hour
+        try:
+            await refresh_league_data()
+        except Exception as e:
+            print(f"Error refreshing league data: {e}")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load league data on startup and cleanup on shutdown."""
-    global league_data, league_df, teams
-    league_data = be.get_league()
-    league_df = be.get_league_cat_data_rankings(league_data)
-    teams = [team.team_name for team in league_data.teams]
+    """Load league data on startup and start periodic refresh task."""
+    # Initial load
+    await refresh_league_data()
+    # Start background task for periodic refresh
+    task = asyncio.create_task(periodic_refresh())
     yield
-    # Cleanup if needed
+    # Cleanup - cancel the background task
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
 
 
 app = FastAPI(title="Space Jammers Dashboard", lifespan=lifespan)
@@ -147,6 +174,28 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
         for i, match in enumerate(box_scores)
     ]
 
+    # Get team rankings for this matchup
+    home_rankings = (
+        league_df.loc[league_df["Team"] == box_score.home_team.team_name].to_dict("records")[0]
+        if not league_df[league_df["Team"] == box_score.home_team.team_name].empty
+        else {}
+    )
+    away_rankings = (
+        league_df.loc[league_df["Team"] == box_score.away_team.team_name].to_dict("records")[0]
+        if not league_df[league_df["Team"] == box_score.away_team.team_name].empty
+        else {}
+    )
+
+    # Create category rankings breakdown showing who is favored in each category
+    category_rankings = []
+    for cat in const.NINE_CATS:
+        home_rank = home_rankings.get(cat, 99)
+        away_rank = away_rankings.get(cat, 99)
+        favored = "home" if home_rank < away_rank else "away" if away_rank < home_rank else "tie"
+        category_rankings.append(
+            {"name": cat, "home_rank": home_rank, "away_rank": away_rank, "favored": favored}
+        )
+
     return templates.TemplateResponse(
         "matchup.html",
         {
@@ -161,6 +210,7 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
             "selected_index": matchup_index,
             "current_week": league_data.currentMatchupPeriod,
             "teams": teams,
+            "category_rankings": category_rankings,
         },
     )
 

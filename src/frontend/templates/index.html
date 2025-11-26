@@ -11,24 +11,25 @@
     }
 
     .welcome-section {
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 2rem;
+        border: 1px solid var(--secondary-silver-dark);
     }
 
     .welcome-section h2 {
-        color: #FF4B4B;
+        color: var(--primary-green);
         margin-bottom: 1rem;
     }
 
     .ai-joke {
-        background-color: #262730;
+        background-color: var(--bg-card);
         padding: 1rem;
         border-radius: 8px;
-        border-left: 4px solid #FF4B4B;
+        border-left: 4px solid var(--primary-green);
         font-style: italic;
-        color: #CCCCCC;
+        color: var(--text-secondary);
         margin-top: 1rem;
     }
 
@@ -37,8 +38,8 @@
     }
 
     .info-banner {
-        background-color: #1E4E7E;
-        border-left: 4px solid #3B82F6;
+        background-color: rgba(143, 188, 143, 0.2);
+        border-left: 4px solid var(--primary-green);
         padding: 1rem;
         margin: 1rem 0;
         border-radius: 4px;
@@ -57,13 +58,13 @@
         width: 100%;
         border-collapse: collapse;
         min-width: 600px;
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
     }
 
     thead {
         position: sticky;
         top: 0;
-        background-color: #262730;
+        background-color: var(--bg-card);
         z-index: 10;
     }
 
@@ -71,7 +72,7 @@
         padding: 0.75rem 0.5rem;
         text-align: center;
         font-weight: 600;
-        border-bottom: 2px solid #FF4B4B;
+        border-bottom: 2px solid var(--primary-green);
         font-size: 0.85rem;
         white-space: nowrap;
     }
@@ -84,7 +85,7 @@
     }
 
     tr:hover {
-        background-color: #2A2A2A;
+        background-color: var(--bg-card);
     }
 
     /* Team name column - left aligned and wider */
@@ -93,46 +94,46 @@
         text-align: left;
         position: sticky;
         left: 0;
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
         font-weight: 600;
         min-width: 120px;
         padding-left: 1rem;
     }
 
     th:first-child {
-        background-color: #262730;
+        background-color: var(--bg-card);
         z-index: 11;
     }
 
     tr:hover td:first-child {
-        background-color: #2A2A2A;
+        background-color: var(--bg-card);
     }
 
     /* Color coding for rankings - green is good */
     .rank-excellent {
-        background-color: rgba(34, 197, 94, 0.2);
-        color: #4ADE80;
+        background-color: rgba(143, 188, 143, 0.3);
+        color: var(--primary-green-light);
         font-weight: 600;
     }
 
     .rank-good {
-        background-color: rgba(132, 204, 22, 0.2);
-        color: #A3E635;
+        background-color: rgba(143, 188, 143, 0.2);
+        color: var(--primary-green);
     }
 
     .rank-average {
-        background-color: rgba(251, 191, 36, 0.2);
-        color: #FCD34D;
+        background-color: rgba(192, 192, 192, 0.2);
+        color: var(--secondary-silver);
     }
 
     .rank-poor {
-        background-color: rgba(251, 146, 60, 0.2);
-        color: #FDBA74;
+        background-color: rgba(192, 192, 192, 0.15);
+        color: var(--secondary-silver-dark);
     }
 
     .rank-bad {
-        background-color: rgba(239, 68, 68, 0.2);
-        color: #F87171;
+        background-color: rgba(139, 0, 0, 0.2);
+        color: #CD5C5C;
         font-weight: 600;
     }
 
@@ -145,20 +146,21 @@
     }
 
     .quick-link {
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
         padding: 1rem;
         border-radius: 8px;
         text-align: center;
         text-decoration: none;
-        color: #FAFAFA;
+        color: var(--text-primary);
         transition: all 0.3s;
-        border: 2px solid transparent;
+        border: 2px solid var(--secondary-silver-dark);
     }
 
     .quick-link:hover {
-        background-color: #FF4B4B;
-        border-color: #FF4B4B;
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
         transform: translateY(-2px);
+        color: var(--bg-dark);
     }
 
     .quick-link-icon {
@@ -208,7 +210,7 @@
 {% block content %}
 <div class="main-content">
     <div class="page-header">
-        <h1>🏀 Space Jammers Lounge</h1>
+        <h1>Space Jammers Lounge</h1>
         <p>Fantasy Basketball League Dashboard</p>
     </div>
 
@@ -216,29 +218,29 @@
         <h2>Welcome to the Space Jammers Lounge</h2>
         <p>Written by the Tatums</p>
         <div class="ai-joke">
-            <strong>🤖 AI-Powered Joke:</strong><br>
+            <strong>AI-Powered Joke:</strong><br>
             {{ joke }}
         </div>
     </div>
 
     <div class="quick-links">
         <a href="#rankings" class="quick-link">
-            <div class="quick-link-icon">📊</div>
-            <div>Rankings</div>
+            <div class="quick-link-icon">Rankings</div>
+            <div>View Rankings</div>
         </a>
         <a href="/matchup/0" class="quick-link">
-            <div class="quick-link-icon">⚔️</div>
-            <div>Matchups</div>
+            <div class="quick-link-icon">Matchups</div>
+            <div>View Matchups</div>
         </a>
     </div>
 
     <div id="rankings" class="section-header">
-        <h2>📊 Category Rankings</h2>
-        <p style="color: #4ADE80; margin-bottom: 0.5rem;">Green is good • Lower rank numbers are better</p>
+        <h2>Category Rankings</h2>
+        <p style="color: var(--primary-green); margin-bottom: 0.5rem;">Green is good • Lower rank numbers are better</p>
     </div>
 
     <div class="info-banner">
-        ℹ️ On mobile, swipe left/right to see all categories. Rotate to landscape for better viewing.
+        Info: On mobile, swipe left/right to see all categories. Rotate to landscape for better viewing.
     </div>
 
     <div class="table-container">
@@ -256,7 +258,7 @@
             <tbody>
                 {% for row in league_data %}
                 <tr>
-                    <td><a href="/team/{{ row.Team }}" style="color: #3B82F6; text-decoration: none;">{{ row.Team }}</a></td>
+                    <td><a href="/team/{{ row.Team }}" style="color: var(--primary-green); text-decoration: none;">{{ row.Team }}</a></td>
                     <td data-rank="{{ row.Standing }}">{{ row.Standing }}</td>
                     <td data-rank="{{ row['Avg. Cat. Rank'] }}">{{ "%.1f"|format(row['Avg. Cat. Rank']) }}</td>
                     {% for col in columns[3:] %}
@@ -268,10 +270,10 @@
         </table>
     </div>
 
-    <div style="margin-top: 2rem; padding: 1rem; background-color: #1E1E1E; border-radius: 8px;">
-        <h3>📱 About This Dashboard</h3>
-        <p>A site to lookup fantasy basketball rankings for Space Jammers league. Data is updated periodically throughout the day.</p>
-        <p style="margin-top: 0.5rem; color: #888; font-size: 0.85rem;">
+    <div style="margin-top: 2rem; padding: 1rem; background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--secondary-silver-dark);">
+        <h3>About This Dashboard</h3>
+        <p>A site to lookup fantasy basketball rankings for Space Jammers league. Data is updated hourly.</p>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">
             Tap team names to view detailed stats • Swipe tables to see all data
         </p>
     </div>

@@ -7,7 +7,7 @@
     /* Mobile-first matchup viewer */
     .back-link {
         display: inline-block;
-        color: #3B82F6;
+        color: var(--primary-green);
         text-decoration: none;
         margin-bottom: 1rem;
         font-size: 0.9rem;
@@ -28,8 +28,8 @@
     }
 
     .info-banner {
-        background-color: #1E4E7E;
-        border-left: 4px solid #3B82F6;
+        background-color: rgba(143, 188, 143, 0.2);
+        border-left: 4px solid var(--primary-green);
         padding: 0.75rem;
         margin-bottom: 1.5rem;
         border-radius: 4px;
@@ -38,7 +38,7 @@
 
     /* Matchup selector - mobile friendly */
     .matchup-selector {
-        background-color: #1E1E1E;
+        background-color: var(--bg-dark);
         border-radius: 8px;
         padding: 1rem;
         margin-bottom: 1.5rem;
@@ -47,7 +47,7 @@
     .matchup-selector h3 {
         font-size: 1rem;
         margin-bottom: 0.75rem;
-        color: #FF4B4B;
+        color: var(--primary-green);
     }
 
     .matchup-list {
@@ -59,10 +59,10 @@
     .matchup-option {
         display: block;
         padding: 0.75rem;
-        background-color: #262730;
+        background-color: var(--bg-card);
         border-radius: 4px;
         text-decoration: none;
-        color: #FAFAFA;
+        color: var(--text-primary);
         transition: all 0.3s;
         border: 2px solid transparent;
         text-align: center;
@@ -71,12 +71,12 @@
 
     .matchup-option:hover {
         background-color: #2A2A2A;
-        border-color: #FF4B4B;
+        border-color: var(--primary-green);
     }
 
     .matchup-option.active {
-        background-color: #FF4B4B;
-        border-color: #FF4B4B;
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
         font-weight: 600;
     }
 
@@ -86,7 +86,7 @@
         align-items: center;
         justify-content: center;
         gap: 1rem;
-        background: #262730;
+        background: var(--bg-card);
         border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         padding: 1rem;
@@ -106,7 +106,7 @@
         object-fit: cover;
         border-radius: 50%;
         margin-bottom: 0.5rem;
-        border: 2px solid #FF4B4B;
+        border: 2px solid var(--primary-green);
     }
 
     .team-name {
@@ -123,7 +123,7 @@
         white-space: nowrap;
         text-align: center;
         flex-shrink: 0;
-        color: #FF4B4B;
+        color: var(--primary-green);
     }
 
     /* Category scores table */
@@ -145,15 +145,15 @@
     }
 
     .category-table th {
-        background-color: #262730;
+        background-color: var(--bg-card);
         font-weight: 600;
-        color: #FAFAFA;
+        color: var(--text-primary);
     }
 
     .category-name {
-        background-color: #262730;
+        background-color: var(--bg-card);
         font-weight: 600;
-        color: #FAFAFA;
+        color: var(--text-primary);
     }
 
     .highlight {
@@ -207,9 +207,9 @@
         .matchup-selector select {
             width: 100%;
             padding: 0.75rem;
-            background-color: #262730;
-            color: #FAFAFA;
-            border: 2px solid #FF4B4B;
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border: 2px solid var(--primary-green);
             border-radius: 4px;
             font-size: 0.9rem;
             cursor: pointer;
@@ -249,12 +249,12 @@
     <a href="/" class="back-link">← Back to Dashboard</a>
 
     <div class="page-header">
-        <h1>⚔️ Week {{ current_week }} - Matchup Viewer</h1>
-        <p style="font-size: 0.9rem; color: #888;">Select a matchup to view head-to-head stats</p>
+        <h1>Week {{ current_week }} - Matchup Viewer</h1>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">Select a matchup to view head-to-head stats</p>
     </div>
 
     <div class="info-banner">
-        ℹ️ Matchup stats are updated once daily in the early morning
+        Matchup stats are updated once daily in the early morning
     </div>
 
     <div class="matchup-selector">
@@ -317,9 +317,39 @@
         </tbody>
     </table>
 
-    <div style="margin-top: 1.5rem; padding: 1rem; background-color: #1E1E1E; border-radius: 8px;">
-        <h3>💡 How to Read</h3>
-        <ul style="color: #888; font-size: 0.85rem; line-height: 1.8; padding-left: 1.5rem;">
+    <div style="margin-top: 1.5rem; padding: 1rem; background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--secondary-silver-dark);">
+        <h3>Category Rankings Breakdown</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">League-wide rankings showing who is favored in each category</p>
+        <table class="category-table">
+            <thead>
+                <tr>
+                    <th>{{ home_team.team_abbrev }} Rank</th>
+                    <th>Category</th>
+                    <th>{{ away_team.team_abbrev }} Rank</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat_rank in category_rankings %}
+                <tr>
+                    <td class="{% if cat_rank.favored == 'home' %}highlight{% endif %}">
+                        {{ cat_rank.home_rank }}
+                    </td>
+                    <td class="category-name">{{ cat_rank.name }}</td>
+                    <td class="{% if cat_rank.favored == 'away' %}highlight{% endif %}">
+                        {{ cat_rank.away_rank }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem; font-style: italic;">
+            Lower rank number = stronger in that category
+        </p>
+    </div>
+
+    <div style="margin-top: 1.5rem; padding: 1rem; background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--secondary-silver-dark);">
+        <h3>How to Read</h3>
+        <ul style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; padding-left: 1.5rem;">
             <li><strong style="color: rgb(230, 131, 39);">Highlighted cells</strong> show the winning stat for that category</li>
             <li>For <strong>TO (Turnovers)</strong>, lower is better</li>
             <li>The middle score shows <strong>Wins - Ties - Losses</strong></li>
