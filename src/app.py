@@ -1,24 +1,20 @@
 """FastAPI application for Space Jammers Dashboard."""
 
+import base64
+import io
+from contextlib import asynccontextmanager
+
 import matplotlib
+
+matplotlib.use("Agg")  # Set non-interactive backend
+import matplotlib.pyplot as plt
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-matplotlib.use("Agg")  # Set non-interactive backend
-import base64
-import io
-
-import matplotlib.pyplot as plt
-
 import src.backend as be
 import src.constants as const
 from src.frontend.figures import create_cat_bar_charts
-
-app = FastAPI(title="Space Jammers Dashboard")
-
-# Setup templates
-templates = Jinja2Templates(directory="src/frontend/templates")
 
 # Global data cache - loaded once at startup
 league_data = None
@@ -26,13 +22,21 @@ league_df = None
 teams = None
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Load league data on startup."""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Load league data on startup and cleanup on shutdown."""
     global league_data, league_df, teams
     league_data = be.get_league()
     league_df = be.get_league_cat_data_rankings(league_data)
     teams = [team.team_name for team in league_data.teams]
+    yield
+    # Cleanup if needed
+
+
+app = FastAPI(title="Space Jammers Dashboard", lifespan=lifespan)
+
+# Setup templates
+templates = Jinja2Templates(directory="src/frontend/templates")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -54,6 +58,7 @@ async def home(request: Request):
             "joke": joke,
             "league_data": league_df_dict,
             "columns": list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys()),
+            "teams": teams,
         },
     )
 
