@@ -1,12 +1,6 @@
 SPACEJAM_LEAGUE_ID = 233677
 YEAR = 2026
 
-# STREAMLIT CONSTANTS
-STREAMLIT_PAGE_TITLE = "SpaceJam Fantasy Basketball League"
-LEAGUE_OVERVIEW_TITLE = "League Overview"
-TEAM_PAGE_TITLE = "Team Viewer"
-MATCHUP_PAGE_TITLE = "The Thunderdome"
-
 NINE_CATS = ["PTS", "BLK", "STL", "AST", "REB", "TO", "3PM", "FG%", "FT%"]
 """The 9 standard categories in fantasy basketball."""
 

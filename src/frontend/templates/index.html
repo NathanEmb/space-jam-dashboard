@@ -257,10 +257,10 @@
                 {% for row in league_data %}
                 <tr>
                     <td><a href="/team/{{ row.Team }}" style="color: #3B82F6; text-decoration: none;">{{ row.Team }}</a></td>
-                    <td class="{{ get_rank_class(row.Standing) }}">{{ row.Standing }}</td>
-                    <td class="{{ get_rank_class(row['Avg. Cat. Rank']) }}">{{ "%.1f"|format(row['Avg. Cat. Rank']) }}</td>
+                    <td data-rank="{{ row.Standing }}">{{ row.Standing }}</td>
+                    <td data-rank="{{ row['Avg. Cat. Rank'] }}">{{ "%.1f"|format(row['Avg. Cat. Rank']) }}</td>
                     {% for col in columns[3:] %}
-                    <td class="{{ get_rank_class(row[col]) }}">{{ row[col] }}</td>
+                    <td data-rank="{{ row[col] }}">{{ row[col] }}</td>
                     {% endfor %}
                 </tr>
                 {% endfor %}
@@ -288,11 +288,11 @@
 
     // Apply rank classes to table cells
     document.addEventListener('DOMContentLoaded', function() {
-        const cells = document.querySelectorAll('td');
+        const cells = document.querySelectorAll('td[data-rank]');
         cells.forEach(cell => {
-            const value = parseFloat(cell.textContent);
-            if (!isNaN(value) && value > 0 && value <= 12) {
-                cell.className = get_rank_class(value);
+            const rank = parseFloat(cell.getAttribute('data-rank'));
+            if (!isNaN(rank) && rank > 0 && rank <= 12) {
+                cell.className = get_rank_class(rank);
             }
         });
     });
