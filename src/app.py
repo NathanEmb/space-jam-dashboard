@@ -3,6 +3,7 @@
 import asyncio
 import base64
 import io
+import logging
 from contextlib import asynccontextmanager
 from datetime import datetime
 
@@ -18,6 +19,13 @@ import src.backend as be
 import src.constants as const
 from src.frontend.figures import create_cat_bar_charts
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Configuration
+REFRESH_INTERVAL_SECONDS = 3600  # 1 hour
+
 # Global data cache - refreshed hourly
 league_data = None
 league_df = None
@@ -32,16 +40,17 @@ async def refresh_league_data():
     league_df = be.get_league_cat_data_rankings(league_data)
     teams = [team.team_name for team in league_data.teams]
     last_update = datetime.now()
+    logger.info(f"League data refreshed at {last_update}")
 
 
 async def periodic_refresh():
     """Periodically refresh league data every hour."""
     while True:
-        await asyncio.sleep(3600)  # Sleep for 1 hour
+        await asyncio.sleep(REFRESH_INTERVAL_SECONDS)
         try:
             await refresh_league_data()
         except Exception as e:
-            print(f"Error refreshing league data: {e}")
+            logger.error(f"Error refreshing league data: {e}", exc_info=True)
 
 
 @asynccontextmanager
