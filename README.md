@@ -9,6 +9,7 @@ This project provides a dashboard for a fantasy basketball league (Space Jammers
 - Team statistics and category rankings
 - Player performance metrics across different timeframes (7, 15, 30 days)
 - Head-to-head matchup comparisons
+- Trade analyzer to evaluate potential trades
 
 ## Architecture
 
@@ -18,27 +19,35 @@ The application is built using:
 - [HTML + CSS](https://developer.mozilla.org/en-US/docs/Web) for the mobile-friendly frontend
 - [ESPN API](https://github.com/cwendt94/espn-api) for fetching fantasy basketball data
 - [Pandas](https://pandas.pydata.org/) for data manipulation and analysis
-- [Matplotlib](https://matplotlib.org/) for data visualization
 - [Jinja2](https://jinja.palletsprojects.com/) for HTML template rendering
-- [Groq API](https://groq.com/) for generating AI content
 
 The project is containerized with Docker and deployed to AWS.
 
 ## Project Structure
 
-- `src/app.py` - FastAPI application with routing and API endpoints
-- `src/backend.py` - Core logic for data fetching and processing
-- `src/prompts.py` - Prompting for AI-generated content via Groq
-- `src/frontend/` - Frontend templates and components
-  - `templates/` - HTML templates for all pages
-  - `figures.py` - Matplotlib visualization functions
+```
+src/
+├── app.py          # FastAPI application with routing and endpoints
+├── backend.py      # Core logic for ESPN API data fetching and processing
+├── constants.py    # League configuration and stat categories
+└── frontend/
+    ├── static/     # Static assets (CSS)
+    │   └── css/
+    │       └── base.css
+    └── templates/  # Jinja2 HTML templates
+        ├── base.html
+        ├── index.html
+        ├── matchup.html
+        ├── team.html
+        └── trade.html
+```
 
 ## Features
 
-- **Category Rankings**: Visualize team performance across different statistical categories
+- **Category Rankings**: Visualize team performance across 9 statistical categories
 - **Team Viewer**: Detailed breakdown of individual team strengths, weaknesses, and trends
 - **Matchup Viewer**: Compare head-to-head matchups with detailed statistics
-- **AI Commentary**: Enjoy witty, sometimes snarky comments about teams and matchups
+- **Trade Analyzer**: Evaluate potential trades with projected stat impact analysis
 - **Mobile-Friendly**: Optimized for mobile devices with responsive design and touch-friendly controls
 
 ## Development Setup
@@ -71,10 +80,6 @@ docker run -p 5006:5006 space-jammers
 ```
 
 Deployment to AWS is automated via GitHub Actions upon completion of a Pull Request to main.
-
-## Environment Variables
-
-- `GROQ_API_KEY` - Required for AI-generated content via the Groq API
 
 ## Contributing
 

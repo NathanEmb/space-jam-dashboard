@@ -9,6 +9,7 @@ This is a **FastAPI + Jinja2** fantasy basketball dashboard that pulls data from
 2. `src/backend.py` - ESPN API data fetching and Pandas transformations
 3. `src/constants.py` - League config, stat categories (`NINE_CATS`), table definitions
 4. `src/frontend/templates/` - Jinja2 templates extending `base.html`
+5. `src/frontend/static/css/` - External CSS (base styles)
 
 **Key Pattern:** League data is cached globally at startup and refreshed hourly. Routes access `league_data`, `league_df`, `teams`, etc. directly.
 
@@ -25,6 +26,7 @@ uv run ruff format . && uv run ruff check --fix .
 ## Template Conventions
 
 All pages extend `base.html` which provides:
+- External CSS via `/static/css/base.css`
 - CSS variables (colors in `:root`)
 - Hamburger sidebar navigation (CSS-only checkbox hack)
 - Feather Icons via CDN (`<i data-feather="icon-name">`)
@@ -53,9 +55,10 @@ All pages extend `base.html` which provides:
 ## CSS Patterns
 
 - Mobile-first responsive design
-- Dark theme with green accents (`--primary-green`, `--bg-dark`, `--bg-card`)
+- Dark theme with green/orange accents (`--primary-green`, `--accent-orange`, `--bg-dark`, `--bg-card`)
 - Interactive elements use CSS checkbox hack (no JS frameworks)
 - Sidebar dropdowns: `.submenu-toggle` checkbox + `.sidebar-submenu` list
+- Shared components in `base.css`: `.page-nav-arrow`, `.info-banner`, table styles
 
 ## Adding New Pages
 
@@ -76,6 +79,15 @@ rankings_df = be.get_league_cat_data_rankings(league)
 # Player stats for a team (7/15/30 day averages)
 stats = be.get_average_team_stats(team_obj, num_days=7)
 
+# Team breakdown into strengths/weaknesses/punts
+strengths, weaknesses, punts = be.get_team_breakdown(team_cat_ranks)
+
 # All players with projections (for trade analyzer)
 players = be.get_all_players_with_projections(league)
+
+# Players organized by team
+players_by_team = be.get_players_by_team(league)
+
+# Calculate trade impact
+impact = be.calculate_trade_impact(team_a_gives, team_a_receives, team_b_gives, team_b_receives)
 ```

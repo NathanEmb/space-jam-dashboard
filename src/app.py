@@ -7,6 +7,7 @@ from datetime import datetime
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 import src.backend as be
@@ -75,6 +76,9 @@ app = FastAPI(title="Space Jammers Dashboard", lifespan=lifespan)
 # Setup templates
 templates = Jinja2Templates(directory="src/frontend/templates")
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="src/frontend/static"), name="static")
+
 
 @app.get("/healthz")
 async def healthz():
@@ -96,6 +100,7 @@ async def home(request: Request):
             "columns": list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys()),
             "teams": teams,
             "matchups": matchups_cache,
+            "last_update": last_update,
         },
     )
 
@@ -144,6 +149,7 @@ async def team_viewer(request: Request, team_name: str):
             "matchups": matchups_cache,
             "prev_team": prev_team,
             "next_team": next_team,
+            "last_update": last_update,
         },
     )
 
@@ -245,6 +251,7 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
             "teams": teams,
             "prev_matchup": prev_matchup,
             "next_matchup": next_matchup,
+            "last_update": last_update,
         },
     )
 
@@ -264,6 +271,7 @@ async def trade_analyzer(request: Request):
             "teams": teams,
             "matchups": matchups_cache,
             "nine_cats": const.NINE_CATS,
+            "last_update": last_update,
         },
     )
 
