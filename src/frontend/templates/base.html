@@ -149,12 +149,20 @@
         }
 
         .sidebar-links a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             color: var(--text-primary);
             text-decoration: none;
             padding: 0.6rem 1rem;
             border-radius: 6px;
             transition: background-color 0.2s ease;
+        }
+
+        .sidebar-links a .feather {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
 
         .sidebar-links a:hover {
@@ -269,6 +277,20 @@
             margin-right: 0.5rem;
         }
 
+        /* Footer */
+        .site-footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--secondary-silver-dark);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .site-footer p {
+            margin: 0;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -303,8 +325,8 @@
                     <div class="sidebar-section">
                         <h3>Menu</h3>
                         <ul class="sidebar-links">
-                            <li><a href="/">🏠 Home</a></li>
-                            <li><a href="/matchup/0">🏀 Matchups</a></li>
+                            <li><a href="/"><i data-feather="home"></i> Home</a></li>
+                            <li><a href="/matchup/0"><i data-feather="target"></i> Matchups</a></li>
                         </ul>
                     </div>
 
@@ -332,6 +354,14 @@
     <div class="container">
         {% block content %}{% endblock %}
     </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Written by the Tatums</p>
+    </footer>
+
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>feather.replace();</script>
 
     {% block extra_js %}{% endblock %}
 </body>
