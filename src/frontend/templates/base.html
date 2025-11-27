@@ -82,7 +82,7 @@
     <footer class="site-footer">
         <p>&copy; 2025 Written by the Tatums</p>
         {% if last_update %}
-        <p class="last-update">Data updated: {{ last_update.strftime('%b %d, %Y at %I:%M %p') }}</p>
+        <p class="last-update">Data updated: <span id="last-update-time" data-utc="{{ last_update.isoformat() }}"></span></p>
         {% endif %}
     </footer>
 
@@ -97,20 +97,21 @@
         let lastScrollY = window.scrollY;
         let ticking = false;
         let scrollUpDistance = 0;
-        const showThreshold = 50; // Need to scroll up this many pixels to show nav
+        const showThreshold = 30; // Need to scroll up this many pixels to show nav
+        const hideThreshold = 5; // Hide nav after scrolling down this many pixels
 
         function updateNav() {
             const currentScrollY = window.scrollY;
             const scrollDelta = lastScrollY - currentScrollY;
             
-            if (currentScrollY > lastScrollY && currentScrollY > 80) {
-                // Scrolling down & past threshold - hide nav
+            if (currentScrollY > lastScrollY && currentScrollY > hideThreshold) {
+                // Scrolling down & past threshold - hide nav immediately
                 nav.classList.add('nav-hidden');
                 scrollUpDistance = 0;
             } else if (currentScrollY < lastScrollY) {
                 // Scrolling up - accumulate distance
                 scrollUpDistance += scrollDelta;
-                if (scrollUpDistance >= showThreshold || currentScrollY <= 80) {
+                if (scrollUpDistance >= showThreshold || currentScrollY <= hideThreshold) {
                     nav.classList.remove('nav-hidden');
                 }
             }
@@ -174,5 +175,23 @@
     </script>
 
     {% block extra_js %}{% endblock %}
+
+    <!-- Convert UTC timestamp to local timezone -->
+    <script>
+    (function() {
+        const el = document.getElementById('last-update-time');
+        if (el) {
+            const utc = el.dataset.utc;
+            const date = new Date(utc);
+            el.textContent = date.toLocaleString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
