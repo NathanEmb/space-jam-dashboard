@@ -254,7 +254,7 @@ async def trade_analyzer(request: Request):
     """Trade analyzer page for comparing player swaps."""
     # Get all players organized by team
     players_by_team = be.get_players_by_team(league_data)
-    
+
     return templates.TemplateResponse(
         "trade.html",
         {
@@ -272,24 +272,22 @@ async def trade_analyzer(request: Request):
 async def analyze_trade(request: Request):
     """API endpoint to calculate trade impact."""
     data = await request.json()
-    
+
     team_a_name = data.get("team_a")
     team_b_name = data.get("team_b")
     team_a_player_names = data.get("team_a_players", [])
     team_b_player_names = data.get("team_b_players", [])
-    
+
     # Get player data
     players_by_team = be.get_players_by_team(league_data)
-    
+
     team_a_players = [
-        p for p in players_by_team.get(team_a_name, []) 
-        if p["name"] in team_a_player_names
+        p for p in players_by_team.get(team_a_name, []) if p["name"] in team_a_player_names
     ]
     team_b_players = [
-        p for p in players_by_team.get(team_b_name, []) 
-        if p["name"] in team_b_player_names
+        p for p in players_by_team.get(team_b_name, []) if p["name"] in team_b_player_names
     ]
-    
+
     # Calculate trade impact
     # Team A gives their selected players, receives Team B's selected players
     impact = be.calculate_trade_impact(
@@ -298,7 +296,7 @@ async def analyze_trade(request: Request):
         team_b_gives=team_b_players,
         team_b_receives=team_a_players,
     )
-    
+
     return {
         "impact": impact,
         "team_a_gives": team_a_players,
