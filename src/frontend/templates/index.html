@@ -100,29 +100,34 @@
     }
 
     /* Color coding for rankings - green to red heat map */
-    .rank-excellent {
-        background-color: rgba(34, 139, 34, 0.7);
+    .rank-1 {
+        background-color: rgba(0, 128, 0, 0.8);
         color: #FFFFFF;
         font-weight: 600;
     }
 
-    .rank-good {
-        background-color: rgba(107, 142, 35, 0.7);
+    .rank-2 {
+        background-color: rgba(60, 150, 40, 0.7);
         color: #FFFFFF;
     }
 
-    .rank-average {
+    .rank-3 {
+        background-color: rgba(130, 160, 50, 0.7);
+        color: #FFFFFF;
+    }
+
+    .rank-4 {
         background-color: rgba(189, 183, 107, 0.7);
         color: #FFFFFF;
     }
 
-    .rank-poor {
-        background-color: rgba(205, 133, 63, 0.7);
+    .rank-5 {
+        background-color: rgba(205, 133, 63, 0.75);
         color: #FFFFFF;
     }
 
-    .rank-bad {
-        background-color: rgba(139, 69, 19, 0.8);
+    .rank-6 {
+        background-color: rgba(139, 69, 19, 0.85);
         color: #FFFFFF;
         font-weight: 600;
     }
@@ -201,11 +206,7 @@
 <div class="main-content">
     <div id="rankings" class="section-header">
         <h2>Category Rankings</h2>
-        <p style="color: var(--primary-green); margin-bottom: 0.5rem;">Green is good • Lower rank numbers are better</p>
-    </div>
-
-    <div class="info-banner">
-        Info: On mobile, swipe left/right to see all categories. Rotate to landscape for better viewing.
+        <p style="color: var(--primary-green); margin-bottom: 0.5rem;">Green is good</p>
     </div>
 
     <div class="table-container">
@@ -238,11 +239,13 @@
 
 <script>
     function get_rank_class(rank) {
-        if (rank <= 2) return 'rank-excellent';
-        if (rank <= 4) return 'rank-good';
-        if (rank <= 6) return 'rank-average';
-        if (rank <= 8) return 'rank-poor';
-        return 'rank-bad';
+        const roundedRank = Math.round(rank);
+        if (roundedRank <= 2) return 'rank-1';
+        if (roundedRank <= 4) return 'rank-2';
+        if (roundedRank <= 5) return 'rank-3';
+        if (roundedRank <= 7) return 'rank-4';
+        if (roundedRank <= 9) return 'rank-5';
+        return 'rank-6';
     }
 
     // Apply rank classes to table cells

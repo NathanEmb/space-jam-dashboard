@@ -345,37 +345,8 @@
 <div class="main-content">
     <div class="page-header">
         <h1>Week {{ current_week }} - Matchup Viewer</h1>
-        <p style="font-size: 0.9rem; color: var(--text-secondary);">Select a matchup to view head-to-head stats</p>
     </div>
 
-    <div class="info-banner">
-        Matchup stats are updated once daily in the early morning
-    </div>
-
-    <div class="matchup-selector">
-        <h3></i> Select Matchup</h3>
-        
-        <!-- Mobile dropdown selector -->
-        <div class="mobile-selector">
-            <select onchange="window.location.href='/matchup/' + this.value">
-                {% for matchup in matchups %}
-                <option value="{{ matchup.index }}" {% if matchup.index == selected_index %}selected{% endif %}>
-                    {{ matchup.label }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Desktop list selector -->
-        <div class="matchup-list desktop-selector">
-            {% for matchup in matchups %}
-            <a href="/matchup/{{ matchup.index }}" 
-               class="matchup-option {% if matchup.index == selected_index %}active{% endif %}">
-                {{ matchup.label }}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
 
     <div class="score-card">
         <div class="team">

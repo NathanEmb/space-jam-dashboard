@@ -472,6 +472,25 @@
     })();
     </script>
 
+    <!-- Only one sidebar dropdown open at a time -->
+    <script>
+    (function() {
+        const submenuToggles = document.querySelectorAll('.submenu-toggle');
+        submenuToggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                if (this.checked) {
+                    // Close all other dropdowns
+                    submenuToggles.forEach(other => {
+                        if (other !== this) {
+                            other.checked = false;
+                        }
+                    });
+                }
+            });
+        });
+    })();
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

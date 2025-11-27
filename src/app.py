@@ -76,6 +76,12 @@ app = FastAPI(title="Space Jammers Dashboard", lifespan=lifespan)
 templates = Jinja2Templates(directory="src/frontend/templates")
 
 
+@app.get("/healthz")
+async def healthz():
+    """Health check endpoint for ECS."""
+    return {"status": "healthy"}
+
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """Main dashboard page with category rankings."""
