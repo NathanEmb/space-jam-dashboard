@@ -391,7 +391,7 @@
                         <ul class="sidebar-links">
                             <li><a href="/"><i data-feather="home"></i> Home</a></li>
                             <li>
-                                <input type="checkbox" id="matchups-submenu" class="submenu-toggle">
+                                <input type="checkbox" id="matchups-submenu" class="submenu-toggle" {% if page_type == 'matchup' %}checked{% endif %}>
                                 <label for="matchups-submenu" class="submenu-trigger">
                                     <span><i data-feather="target"></i> Matchups</span>
                                     <i data-feather="chevron-down" class="submenu-arrow"></i>
@@ -403,7 +403,7 @@
                                 </ul>
                             </li>
                             <li>
-                                <input type="checkbox" id="teams-submenu" class="submenu-toggle">
+                                <input type="checkbox" id="teams-submenu" class="submenu-toggle" {% if page_type == 'team' %}checked{% endif %}>
                                 <label for="teams-submenu" class="submenu-trigger">
                                     <span><i data-feather="users"></i> Teams</span>
                                     <i data-feather="chevron-down" class="submenu-arrow"></i>

@@ -85,6 +85,7 @@ async def home(request: Request):
         "index.html",
         {
             "request": request,
+            "page_type": "home",
             "league_data": league_df_dict,
             "columns": list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys()),
             "teams": teams,
@@ -111,6 +112,7 @@ async def team_viewer(request: Request, team_name: str):
         "team.html",
         {
             "request": request,
+            "page_type": "team",
             "team_name": team_name,
             "team": team_obj,
             "standing": team_obj.standing,
@@ -211,6 +213,7 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
         "matchup.html",
         {
             "request": request,
+            "page_type": "matchup",
             "home_team": box_score.home_team,
             "away_team": box_score.away_team,
             "home_wins": box_score.home_wins,
