@@ -172,15 +172,40 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
         else {}
     )
 
-    # Create category rankings breakdown showing who is favored in each category
-    category_rankings = []
-    for cat in const.NINE_CATS:
-        home_rank = home_rankings.get(cat, 99)
-        away_rank = away_rankings.get(cat, 99)
-        favored = "home" if home_rank < away_rank else "away" if away_rank < home_rank else "tie"
-        category_rankings.append(
-            {"name": cat, "home_rank": home_rank, "away_rank": away_rank, "favored": favored}
-        )
+    # Calculate advantage thresholds based on number of teams
+    num_teams = len(teams)
+    large_advantage_threshold = num_teams // 2  # 6 for 12 teams
+    small_advantage_threshold = num_teams // 4  # 3 for 12 teams
+
+    # Combine category scores with rankings
+    combined_categories = []
+    for cat, data in box_score.home_stats.items():
+        if cat in const.NINE_CATS:
+            home_rank = home_rankings.get(cat, 99)
+            away_rank = away_rankings.get(cat, 99)
+            rank_diff = away_rank - home_rank  # positive = home advantage
+
+            # Determine advantage level
+            if abs(rank_diff) >= large_advantage_threshold:
+                advantage = "large"
+            elif abs(rank_diff) >= small_advantage_threshold:
+                advantage = "small"
+            else:
+                advantage = "even"
+
+            advantage_side = "home" if rank_diff > 0 else "away" if rank_diff < 0 else "none"
+
+            combined_categories.append(
+                {
+                    "name": cat,
+                    "home": round(data["value"], 2),
+                    "away": round(box_score.away_stats[cat]["value"], 2),
+                    "home_rank": home_rank,
+                    "away_rank": away_rank,
+                    "advantage": advantage,
+                    "advantage_side": advantage_side,
+                }
+            )
 
     return templates.TemplateResponse(
         "matchup.html",
@@ -191,13 +216,12 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
             "home_wins": box_score.home_wins,
             "away_wins": box_score.away_wins,
             "ties": box_score.home_ties,
-            "matchup_scores": agg_cat_scores,
+            "combined_categories": combined_categories,
             "matchups": matchups,
             "matchups_nav": matchups_cache,
             "selected_index": matchup_index,
             "current_week": league_data.currentMatchupPeriod,
             "teams": teams,
-            "category_rankings": category_rankings,
         },
     )
 

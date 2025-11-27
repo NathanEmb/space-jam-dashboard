@@ -118,7 +118,7 @@
     .category-table {
         width: 100%;
         border-collapse: collapse;
-        background: rgba(224, 128, 38, 0.819);
+        background: var(--bg-card);
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         overflow: hidden;
@@ -128,25 +128,90 @@
     .category-table td {
         padding: 0.75rem 0.5rem;
         text-align: center;
-        border-bottom: 1px solid rgba(9, 7, 7, 0.55);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         font-size: 0.9rem;
     }
 
     .category-table th {
-        background-color: var(--bg-card);
+        background-color: var(--bg-dark);
         font-weight: 600;
         color: var(--text-primary);
     }
 
     .category-name {
-        background-color: var(--bg-card);
+        background-color: var(--bg-dark);
         font-weight: 600;
         color: var(--text-primary);
+        width: 60px;
     }
 
-    .highlight {
-        background-color: rgb(230, 131, 39);
-        font-weight: bold;
+    .stat-cell {
+        position: relative;
+    }
+
+    .stat-left {
+        text-align: right;
+        padding-right: 0.75rem;
+    }
+
+    .stat-right {
+        text-align: left;
+        padding-left: 0.75rem;
+    }
+
+    .stat-value {
+        font-weight: 600;
+    }
+
+    .stat-winning {
+        color: var(--primary-green);
+    }
+
+    .rank-cell {
+        width: 50px;
+        padding: 0.5rem 0.25rem;
+        background-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .rank-left {
+        text-align: right;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rank-right {
+        text-align: left;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rank-indicator {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        opacity: 0.6;
+    }
+
+    .advantage-arrow {
+        font-size: 0.75rem;
+        opacity: 0.5;
+    }
+    
+    .rank-left .advantage-arrow {
+        margin-right: 0.15rem;
+    }
+    
+    .rank-right .advantage-arrow {
+        margin-left: 0.15rem;
+    }
+
+    .advantage-arrow.large {
+        opacity: 0.7;
+    }
+
+    .home-advantage {
+        color: var(--primary-green);
+    }
+
+    .away-advantage {
+        color: var(--primary-green);
     }
 
     /* Expandable selector for mobile */
@@ -228,6 +293,23 @@
             padding: 0.4rem 0.2rem;
             font-size: 0.75rem;
         }
+
+        .rank-cell {
+            width: 35px;
+            padding: 0.4rem 0.1rem;
+        }
+
+        .rank-indicator {
+            font-size: 0.6rem;
+        }
+
+        .advantage-arrow {
+            font-size: 0.65rem;
+        }
+
+        .category-name {
+            width: 40px;
+        }
     }
 </style>
 {% endblock %}
@@ -284,19 +366,39 @@
         <thead>
             <tr>
                 <th>{{ home_team.team_abbrev }}</th>
-                <th>Category</th>
+                <th colspan="3">Category</th>
                 <th>{{ away_team.team_abbrev }}</th>
             </tr>
         </thead>
         <tbody>
-            {% for category in matchup_scores %}
+            {% for cat in combined_categories %}
             <tr>
-                <td class="{% if (category.name == 'TO' and category.home < category.away) or (category.name != 'TO' and category.home > category.away) %}highlight{% endif %}">
-                    {{ category.home }}
+                <td class="stat-cell stat-left">
+                    <span class="stat-value {% if (cat.name == 'TO' and cat.home < cat.away) or (cat.name != 'TO' and cat.home > cat.away) %}stat-winning{% endif %}">
+                        {{ cat.home }}
+                    </span>
                 </td>
-                <td class="category-name">{{ category.name }}</td>
-                <td class="{% if (category.name == 'TO' and category.away < category.home) or (category.name != 'TO' and category.away > category.home) %}highlight{% endif %}">
-                    {{ category.away }}
+                <td class="rank-cell rank-left">
+                    {% if cat.advantage_side == 'home' and cat.advantage == 'large' %}
+                    <span class="advantage-arrow large home-advantage">&laquo;</span>
+                    {% elif cat.advantage_side == 'home' and cat.advantage == 'small' %}
+                    <span class="advantage-arrow home-advantage">&lsaquo;</span>
+                    {% endif %}
+                    <span class="rank-indicator">#{{ cat.home_rank }}</span>
+                </td>
+                <td class="category-name">{{ cat.name }}</td>
+                <td class="rank-cell rank-right">
+                    <span class="rank-indicator">#{{ cat.away_rank }}</span>
+                    {% if cat.advantage_side == 'away' and cat.advantage == 'large' %}
+                    <span class="advantage-arrow large away-advantage">&raquo;</span>
+                    {% elif cat.advantage_side == 'away' and cat.advantage == 'small' %}
+                    <span class="advantage-arrow away-advantage">&rsaquo;</span>
+                    {% endif %}
+                </td>
+                <td class="stat-cell stat-right">
+                    <span class="stat-value {% if (cat.name == 'TO' and cat.away < cat.home) or (cat.name != 'TO' and cat.away > cat.home) %}stat-winning{% endif %}">
+                        {{ cat.away }}
+                    </span>
                 </td>
             </tr>
             {% endfor %}
@@ -304,42 +406,11 @@
     </table>
 
     <div style="margin-top: 1.5rem; padding: 1rem; background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--secondary-silver-dark);">
-        <h3>Category Rankings Breakdown</h3>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">League-wide rankings showing who is favored in each category</p>
-        <table class="category-table">
-            <thead>
-                <tr>
-                    <th>{{ home_team.team_abbrev }} Rank</th>
-                    <th>Category</th>
-                    <th>{{ away_team.team_abbrev }} Rank</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cat_rank in category_rankings %}
-                <tr>
-                    <td class="{% if cat_rank.favored == 'home' %}highlight{% endif %}">
-                        {{ cat_rank.home_rank }}
-                    </td>
-                    <td class="category-name">{{ cat_rank.name }}</td>
-                    <td class="{% if cat_rank.favored == 'away' %}highlight{% endif %}">
-                        {{ cat_rank.away_rank }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 1rem; font-style: italic;">
-            Lower rank number = stronger in that category
-        </p>
-    </div>
-
-    <div style="margin-top: 1.5rem; padding: 1rem; background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--secondary-silver-dark);">
         <h3>How to Read</h3>
         <ul style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; padding-left: 1.5rem;">
-            <li><strong style="color: rgb(230, 131, 39);">Highlighted cells</strong> show the winning stat for that category</li>
-            <li>For <strong>TO (Turnovers)</strong>, lower is better</li>
-            <li>The middle score shows <strong>Wins - Ties - Losses</strong></li>
-            <li>Stats are season totals for the current matchup period</li>
+            <li><strong style="color: var(--primary-green);">Green values</strong> show the winning stat for that category</li>
+            <li><span class="rank-indicator" style="opacity: 1;">#X</span> shows each team's league-wide ranking for that category</li>
+            <li><span class="advantage-arrow" style="opacity: 1;">&lsaquo;</span> slight ranking advantage, <span class="advantage-arrow" style="opacity: 1;">&laquo;</span> large ranking advantage</li>
         </ul>
     </div>
 </div>
