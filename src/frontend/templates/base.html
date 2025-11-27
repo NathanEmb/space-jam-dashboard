@@ -88,6 +88,7 @@
             transition: transform 0.3s ease;
             z-index: 1000;
             overflow-y: auto;
+            overscroll-behavior: contain;
             padding-top: 80px;
         }
 
@@ -233,10 +234,12 @@
             transform: rotate(180deg);
         }
 
-        /* Team list in sidebar */
-        .team-list {
+        /* Scrollable submenu lists */
+        .sidebar-submenu.sidebar-matchup-list,
+        .sidebar-submenu.team-list {
             max-height: 300px;
             overflow-y: auto;
+            overscroll-behavior: contain;
         }
 
         .team-list a {
@@ -396,7 +399,7 @@
                                     <span><i data-feather="target"></i> Matchups</span>
                                     <i data-feather="chevron-down" class="submenu-arrow"></i>
                                 </label>
-                                <ul class="sidebar-submenu">
+                                <ul class="sidebar-submenu sidebar-matchup-list">
                                     {% for matchup in matchups %}
                                     <li><a href="/matchup/{{ matchup.index }}">{{ matchup.label }}</a></li>
                                     {% endfor %}
@@ -487,6 +490,32 @@
                     });
                 }
             });
+        });
+    })();
+    </script>
+
+    <!-- Prevent body scroll when sidebar is open -->
+    <script>
+    (function() {
+        const menuToggle = document.getElementById('menu-toggle');
+        let scrollPosition = 0;
+        
+        menuToggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Save scroll position and lock body
+                scrollPosition = window.pageYOffset;
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${scrollPosition}px`;
+                document.body.style.width = '100%';
+            } else {
+                // Restore scroll position and unlock body
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, scrollPosition);
+            }
         });
     })();
     </script>

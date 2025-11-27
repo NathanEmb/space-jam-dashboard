@@ -105,6 +105,11 @@ async def team_viewer(request: Request, team_name: str):
     """Team viewer page showing detailed team statistics."""
     team_obj = league_data.team_dict[team_name]
 
+    # Calculate prev/next team indices
+    current_idx = teams.index(team_name)
+    prev_team = teams[(current_idx - 1) % len(teams)]
+    next_team = teams[(current_idx + 1) % len(teams)]
+
     # Get player stats for different timeframes
     seven_day_stats = be.get_average_team_stats(team_obj, 7)
     fifteen_day_stats = be.get_average_team_stats(team_obj, 15)
@@ -137,6 +142,8 @@ async def team_viewer(request: Request, team_name: str):
             "all_columns": list(seven_day_stats.columns),
             "teams": teams,
             "matchups": matchups_cache,
+            "prev_team": prev_team,
+            "next_team": next_team,
         },
     )
 
@@ -149,6 +156,11 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
 
     # Get selected matchup
     box_score = box_scores[matchup_index]
+
+    # Calculate prev/next matchup indices
+    num_matchups = len(box_scores)
+    prev_matchup = (matchup_index - 1) % num_matchups
+    next_matchup = (matchup_index + 1) % num_matchups
 
     # Aggregate category scores
     agg_cat_scores = []
@@ -231,6 +243,8 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
             "selected_index": matchup_index,
             "current_week": league_data.currentMatchupPeriod,
             "teams": teams,
+            "prev_matchup": prev_matchup,
+            "next_matchup": next_matchup,
         },
     )
 
