@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Space Jammers Dashboard - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Mobile-first design */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .welcome-section {
+        background-color: var(--bg-dark);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--secondary-silver-dark);
+    }
+
+    .welcome-section h2 {
+        color: var(--primary-green);
+        margin-bottom: 1rem;
+    }
+
+    .section-header {
+        margin: 2rem 0 1rem 0;
+    }
+
+    /* Color coding for rankings - green to red heat map */
+    .rank-1 {
+        background-color: rgba(0, 128, 0, 0.8);
+        color: #FFFFFF;
+        font-weight: 600;
+    }
+
+    .rank-2 {
+        background-color: rgba(60, 150, 40, 0.7);
+        color: #FFFFFF;
+    }
+
+    .rank-3 {
+        background-color: rgba(130, 160, 50, 0.7);
+        color: #FFFFFF;
+    }
+
+    .rank-4 {
+        background-color: rgba(189, 183, 107, 0.7);
+        color: #FFFFFF;
+    }
+
+    .rank-5 {
+        background-color: rgba(205, 133, 63, 0.75);
+        color: #FFFFFF;
+    }
+
+    .rank-6 {
+        background-color: rgba(139, 69, 19, 0.85);
+        color: #FFFFFF;
+        font-weight: 600;
+    }
+
+    /* Quick links for mobile */
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .quick-link {
+        background-color: var(--bg-dark);
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        color: var(--text-primary);
+        transition: all 0.3s;
+        border: 2px solid var(--secondary-silver-dark);
+    }
+
+    .quick-link:hover {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+        transform: translateY(-2px);
+        color: var(--bg-dark);
+    }
+
+    .quick-link-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+
+        th, td {
+            padding: 0.5rem 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        td:first-child,
+        th:first-child {
+            min-width: 100px;
+            padding-left: 0.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .quick-links {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        th, td {
+            font-size: 0.7rem;
+            padding: 0.4rem 0.2rem;
+        }
+
+        td:first-child,
+        th:first-child {
+            min-width: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div id="rankings" class="section-header">
+        <h2>Category Rankings</h2>
+        <p style="color: var(--primary-green); margin-bottom: 0.5rem;">Green is good</p>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Team</th>
+                    <th>Standing</th>
+                    <th>Avg Rank</th>
+                    {% for col in columns[3:] %}
+                    <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in league_data %}
+                <tr>
+                    <td><a href="/team/{{ row.Team }}" style="color: var(--primary-green); text-decoration: none;">{{ row.Team }}</a></td>
+                    <td data-rank="{{ row.Standing }}">{{ row.Standing }}</td>
+                    <td data-rank="{{ row['Avg. Cat. Rank'] }}">{{ "%.1f"|format(row['Avg. Cat. Rank']) }}</td>
+                    {% for col in columns[3:] %}
+                    <td data-rank="{{ row[col] }}">{{ row[col] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function get_rank_class(rank) {
+        const roundedRank = Math.round(rank);
+        if (roundedRank <= 2) return 'rank-1';
+        if (roundedRank <= 4) return 'rank-2';
+        if (roundedRank <= 5) return 'rank-3';
+        if (roundedRank <= 7) return 'rank-4';
+        if (roundedRank <= 9) return 'rank-5';
+        return 'rank-6';
+    }
+
+    // Apply rank classes to table cells
+    document.addEventListener('DOMContentLoaded', function() {
+        const cells = document.querySelectorAll('td[data-rank]');
+        cells.forEach(cell => {
+            const rank = parseFloat(cell.getAttribute('data-rank'));
+            if (!isNaN(rank) && rank > 0 && rank <= 12) {
+                cell.className = get_rank_class(rank);
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+
+{% block title %}Week {{ current_week }} - Matchup Viewer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Mobile-first matchup viewer */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+        flex: 1;
+        text-align: center;
+    }
+
+    .info-banner {
+        background-color: rgba(143, 188, 143, 0.2);
+        border-left: 4px solid var(--primary-green);
+        padding: 0.75rem;
+        margin-bottom: 1.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    /* Matchup selector - mobile friendly */
+    .matchup-selector {
+        background-color: var(--bg-dark);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .matchup-selector h3 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        color: var(--primary-green);
+    }
+
+    .matchup-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .matchup-option {
+        display: block;
+        padding: 0.75rem;
+        background-color: var(--bg-card);
+        border-radius: 4px;
+        text-decoration: none;
+        color: var(--text-primary);
+        transition: all 0.3s;
+        border: 2px solid transparent;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .matchup-option:hover {
+        background-color: #2A2A2A;
+        border-color: var(--primary-green);
+    }
+
+    .matchup-option.active {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+        font-weight: 600;
+    }
+
+    /* Score card - mobile optimized */
+    .score-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        background: var(--bg-card);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+    }
+
+    .team img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 0.5rem;
+        border: 2px solid var(--primary-green);
+    }
+
+    .team-name {
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-align: center;
+        word-wrap: break-word;
+        max-width: 100%;
+    }
+
+    .score {
+        font-size: 1.5rem;
+        font-weight: bold;
+        white-space: nowrap;
+        text-align: center;
+        flex-shrink: 0;
+        color: var(--primary-green);
+    }
+
+    /* Category scores table */
+    .category-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-card);
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .category-table th,
+    .category-table td {
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9rem;
+    }
+
+    .category-table th {
+        background-color: var(--bg-dark);
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .category-name {
+        background-color: var(--bg-dark);
+        font-weight: 600;
+        color: var(--text-primary);
+        width: 60px;
+    }
+
+    .stat-cell {
+        position: relative;
+    }
+
+    .stat-left {
+        text-align: right;
+        padding-right: 0.75rem;
+    }
+
+    .stat-right {
+        text-align: left;
+        padding-left: 0.75rem;
+    }
+
+    .stat-value {
+        font-weight: 600;
+    }
+
+    .rank-cell {
+        width: 60px;
+        padding: 0.5rem 0.25rem;
+        background-color: rgba(0, 0, 0, 0.15);
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .rank-cell-content {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.2rem;
+        height: 100%;
+    }
+
+    .rank-left {
+        text-align: right;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rank-left .rank-cell-content {
+        justify-content: flex-end;
+    }
+
+    .rank-right {
+        text-align: left;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rank-right .rank-cell-content {
+        justify-content: flex-start;
+    }
+
+    .rank-indicator {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        opacity: 0.7;
+        line-height: 1;
+    }
+
+    .stat-cell.has-advantage {
+        background-color: rgba(0, 200, 83, 0.15);
+    }
+
+    .advantage-arrow {
+        display: inline-flex;
+        align-items: center;
+        opacity: 0.85;
+    }
+
+    .advantage-arrow svg {
+        width: 14px;
+        height: 14px;
+        stroke-width: 2.5;
+    }
+
+    .advantage-arrow.large svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 3;
+    }
+
+    .advantage-arrow.large {
+        opacity: 1;
+    }
+
+    .home-advantage {
+        color: var(--primary-green);
+    }
+
+    .away-advantage {
+        color: var(--primary-green);
+    }
+
+    /* Expandable selector for mobile */
+    .mobile-selector {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 1.25rem;
+        }
+
+        .score-card {
+            padding: 0.75rem;
+            gap: 0.75rem;
+        }
+
+        .team img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .team-name {
+            font-size: 0.8rem;
+        }
+
+        .score {
+            font-size: 1.25rem;
+        }
+
+        .category-table th,
+        .category-table td {
+            padding: 0.5rem 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        /* Show mobile selector, hide desktop list */
+        .mobile-selector {
+            display: block;
+        }
+
+        .desktop-selector {
+            display: none;
+        }
+
+        .matchup-selector select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border: 2px solid var(--primary-green);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .score-card {
+            padding: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .team img {
+            width: 35px;
+            height: 35px;
+        }
+
+        .team-name {
+            font-size: 0.7rem;
+        }
+
+        .score {
+            font-size: 1rem;
+        }
+
+        .category-table th,
+        .category-table td {
+            padding: 0.4rem 0.2rem;
+            font-size: 0.75rem;
+        }
+
+        .rank-cell {
+            width: 45px;
+            padding: 0.4rem 0.1rem;
+        }
+
+        .rank-indicator {
+            font-size: 0.8rem;
+            vertical-align: middle;
+        }
+
+        .advantage-arrow {
+            font-size: 1.25rem;
+            vertical-align: middle;
+            line-height: 1;
+        }
+
+        .category-name {
+            width: 40px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="page-header">
+        <a href="/matchup/{{ prev_matchup }}" class="page-nav-arrow">
+            <i data-feather="chevron-left"></i>
+        </a>
+        <h1>Week {{ current_week }} - Matchup Viewer</h1>
+        <a href="/matchup/{{ next_matchup }}" class="page-nav-arrow">
+            <i data-feather="chevron-right"></i>
+        </a>
+    </div>
+
+    <div class="score-card">
+        <div class="team">
+            <img src="{{ home_team.logo_url }}" alt="{{ home_team.team_name }} Logo">
+            <div class="team-name">{{ home_team.team_name }}</div>
+        </div>
+        <div class="score">{{ home_wins }} - {{ ties }} - {{ away_wins }}</div>
+        <div class="team">
+            <img src="{{ away_team.logo_url }}" alt="{{ away_team.team_name }} Logo">
+            <div class="team-name">{{ away_team.team_name }}</div>
+        </div>
+    </div>
+
+    <table class="category-table">
+        <thead>
+            <tr>
+                <th>{{ home_team.team_abbrev }}</th>
+                <th colspan="3">Category</th>
+                <th>{{ away_team.team_abbrev }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat in combined_categories %}
+            <tr>
+                <td class="stat-cell stat-left {% if cat.advantage_side == 'home' %}has-advantage{% endif %}">
+                    <span class="stat-value {% if (cat.name == 'TO' and cat.home < cat.away) or (cat.name != 'TO' and cat.home > cat.away) %}stat-winning{% endif %}">
+                        {{ cat.home }}
+                    </span>
+                </td>
+                <td class="rank-cell rank-left">
+                    <span class="rank-cell-content">
+                        {% if cat.advantage_side == 'home' and cat.advantage == 'large' %}
+                        <span class="advantage-arrow large home-advantage"><i data-feather="chevrons-left"></i></span>
+                        {% elif cat.advantage_side == 'home' and cat.advantage == 'small' %}
+                        <span class="advantage-arrow home-advantage"><i data-feather="chevron-left"></i></span>
+                        {% endif %}
+                        <span class="rank-indicator">#{{ cat.home_rank }}</span>
+                    </span>
+                </td>
+                <td class="category-name">{{ cat.name }}</td>
+                <td class="rank-cell rank-right">
+                    <span class="rank-cell-content">
+                        <span class="rank-indicator">#{{ cat.away_rank }}</span>
+                        {% if cat.advantage_side == 'away' and cat.advantage == 'large' %}
+                        <span class="advantage-arrow large away-advantage"><i data-feather="chevrons-right"></i></span>
+                        {% elif cat.advantage_side == 'away' and cat.advantage == 'small' %}
+                        <span class="advantage-arrow away-advantage"><i data-feather="chevron-right"></i></span>
+                        {% endif %}
+                    </span>
+                </td>
+                <td class="stat-cell stat-right {% if cat.advantage_side == 'away' %}has-advantage{% endif %}">
+                    <span class="stat-value {% if (cat.name == 'TO' and cat.away < cat.home) or (cat.name != 'TO' and cat.away > cat.home) %}stat-winning{% endif %}">
+                        {{ cat.away }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 1.5rem; padding: 1rem; background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--secondary-silver-dark);">
+        <h3>How to Read</h3>
+        <ul style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; padding-left: 1.5rem;">
+            <li><strong style="color: var(--primary-green);">Green values</strong> show the winning stat for that category</li>
+            <li><span class="rank-indicator" style="opacity: 1;">#X</span> shows each team's league-wide ranking for that category</li>
+            <li><span class="advantage-arrow" style="opacity: 1;">&lsaquo;</span> slight ranking advantage, <span class="advantage-arrow" style="opacity: 1;">&laquo;</span> large ranking advantage</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

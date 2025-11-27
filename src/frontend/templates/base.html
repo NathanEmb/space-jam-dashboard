@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Space Jammers Dashboard{% endblock %}</title>
+    <link rel="icon" href="https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg">
+    <link rel="stylesheet" href="/static/css/base.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="nav-left">
+                <!-- Hamburger Menu Toggle -->
+                <input type="checkbox" id="menu-toggle">
+                <label for="menu-toggle" class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </label>
+
+                <!-- Sidebar Navigation -->
+                <aside class="sidebar-nav">
+                    <div class="sidebar-header">
+                        <h2>Navigation</h2>
+                        <label for="menu-toggle" class="sidebar-close">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </label>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <h3>Menu</h3>
+                        <ul class="sidebar-links">
+                            <li><a href="/"><i data-feather="home"></i> Home</a></li>
+                            <li>
+                                <input type="checkbox" id="matchups-submenu" class="submenu-toggle" {% if page_type == 'matchup' %}checked{% endif %}>
+                                <label for="matchups-submenu" class="submenu-trigger">
+                                    <span><i data-feather="target"></i> Matchups</span>
+                                    <i data-feather="chevron-down" class="submenu-arrow"></i>
+                                </label>
+                                <ul class="sidebar-submenu sidebar-matchup-list">
+                                    {% for matchup in matchups %}
+                                    <li><a href="/matchup/{{ matchup.index }}">{{ matchup.label }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="teams-submenu" class="submenu-toggle" {% if page_type == 'team' %}checked{% endif %}>
+                                <label for="teams-submenu" class="submenu-trigger">
+                                    <span><i data-feather="users"></i> Teams</span>
+                                    <i data-feather="chevron-down" class="submenu-arrow"></i>
+                                </label>
+                                <ul class="sidebar-submenu team-list">
+                                    {% for team in teams %}
+                                    <li><a href="/team/{{ team | urlencode }}">{{ team }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <li><a href="/trade" {% if page_type == 'trade' %}class="active"{% endif %}><i data-feather="repeat"></i> Trade Analyzer</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Overlay to close sidebar -->
+                <label for="menu-toggle" class="sidebar-overlay"></label>
+
+                <a href="/" class="nav-logo">
+                    <img src="https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg" alt="Space Jammers Logo">
+                    <h1>Space Jammers</h1>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 Written by the Tatums</p>
+        {% if last_update %}
+        <p class="last-update">Data updated: {{ last_update.strftime('%b %d, %Y at %I:%M %p') }}</p>
+        {% endif %}
+    </footer>
+
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>feather.replace();</script>
+
+    <!-- Scroll-up-to-reveal nav -->
+    <script>
+    (function() {
+        const nav = document.querySelector('nav');
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+        let scrollUpDistance = 0;
+        const showThreshold = 50; // Need to scroll up this many pixels to show nav
+
+        function updateNav() {
+            const currentScrollY = window.scrollY;
+            const scrollDelta = lastScrollY - currentScrollY;
+            
+            if (currentScrollY > lastScrollY && currentScrollY > 80) {
+                // Scrolling down & past threshold - hide nav
+                nav.classList.add('nav-hidden');
+                scrollUpDistance = 0;
+            } else if (currentScrollY < lastScrollY) {
+                // Scrolling up - accumulate distance
+                scrollUpDistance += scrollDelta;
+                if (scrollUpDistance >= showThreshold || currentScrollY <= 80) {
+                    nav.classList.remove('nav-hidden');
+                }
+            }
+            
+            lastScrollY = currentScrollY;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(updateNav);
+                ticking = true;
+            }
+        });
+    })();
+    </script>
+
+    <!-- Only one sidebar dropdown open at a time -->
+    <script>
+    (function() {
+        const submenuToggles = document.querySelectorAll('.submenu-toggle');
+        submenuToggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                if (this.checked) {
+                    // Close all other dropdowns
+                    submenuToggles.forEach(other => {
+                        if (other !== this) {
+                            other.checked = false;
+                        }
+                    });
+                }
+            });
+        });
+    })();
+    </script>
+
+    <!-- Prevent body scroll when sidebar is open -->
+    <script>
+    (function() {
+        const menuToggle = document.getElementById('menu-toggle');
+        let scrollPosition = 0;
+        
+        menuToggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Save scroll position and lock body
+                scrollPosition = window.pageYOffset;
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${scrollPosition}px`;
+                document.body.style.width = '100%';
+            } else {
+                // Restore scroll position and unlock body
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, scrollPosition);
+            }
+        });
+    })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

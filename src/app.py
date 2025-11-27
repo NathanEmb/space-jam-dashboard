@@ -1,0 +1,320 @@
+"""FastAPI application for Space Jammers Dashboard."""
+
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+from datetime import datetime
+
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+import src.backend as be
+import src.constants as const
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Configuration
+REFRESH_INTERVAL_SECONDS = 3600  # 1 hour
+
+# Global data cache - refreshed hourly
+league_data = None
+league_df = None
+teams = None
+last_update = None
+box_scores_cache = None
+matchups_cache = None
+
+
+async def refresh_league_data():
+    """Refresh league data from ESPN API."""
+    global league_data, league_df, teams, last_update, box_scores_cache, matchups_cache
+    league_data = be.get_league()
+    league_df = be.get_league_cat_data_rankings(league_data)
+    teams = [team.team_name for team in league_data.teams]
+    box_scores_cache = be.get_league_box_scores(league_data)
+    # Pre-format matchups for sidebar navigation
+    matchups_cache = [
+        {"index": i, "label": f"{match.home_team.team_name} vs {match.away_team.team_name}"}
+        for i, match in enumerate(box_scores_cache)
+    ]
+    last_update = datetime.now()
+    logger.info(f"League data refreshed at {last_update}")
+
+
+async def periodic_refresh():
+    """Periodically refresh league data every hour."""
+    while True:
+        await asyncio.sleep(REFRESH_INTERVAL_SECONDS)
+        try:
+            await refresh_league_data()
+        except Exception as e:
+            logger.error(f"Error refreshing league data: {e}", exc_info=True)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Load league data on startup and start periodic refresh task."""
+    # Initial load
+    await refresh_league_data()
+    # Start background task for periodic refresh
+    task = asyncio.create_task(periodic_refresh())
+    yield
+    # Cleanup - cancel the background task
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+
+
+app = FastAPI(title="Space Jammers Dashboard", lifespan=lifespan)
+
+# Setup templates
+templates = Jinja2Templates(directory="src/frontend/templates")
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="src/frontend/static"), name="static")
+
+
+@app.get("/healthz")
+async def healthz():
+    """Health check endpoint for ECS."""
+    return {"status": "healthy"}
+
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    """Main dashboard page with category rankings."""
+    league_df_dict = league_df.to_dict("records")
+
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "page_type": "home",
+            "league_data": league_df_dict,
+            "columns": list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys()),
+            "teams": teams,
+            "matchups": matchups_cache,
+            "last_update": last_update,
+        },
+    )
+
+
+@app.get("/team/{team_name}", response_class=HTMLResponse)
+async def team_viewer(request: Request, team_name: str):
+    """Team viewer page showing detailed team statistics."""
+    team_obj = league_data.team_dict[team_name]
+
+    # Calculate prev/next team indices
+    current_idx = teams.index(team_name)
+    prev_team = teams[(current_idx - 1) % len(teams)]
+    next_team = teams[(current_idx + 1) % len(teams)]
+
+    # Get player stats for different timeframes
+    seven_day_stats = be.get_average_team_stats(team_obj, 7)
+    fifteen_day_stats = be.get_average_team_stats(team_obj, 15)
+    thirty_day_stats = be.get_average_team_stats(team_obj, 30)
+
+    # Get team breakdown
+    team_data = league_df.loc[league_df["Team"] == team_name].to_dict("records")[0]
+    strengths, weaknesses, punts = be.get_team_breakdown(team_data)
+
+    return templates.TemplateResponse(
+        "team.html",
+        {
+            "request": request,
+            "page_type": "team",
+            "team_name": team_name,
+            "team": team_obj,
+            "standing": team_obj.standing,
+            "division": team_obj.division_name,
+            "wins": team_obj.wins,
+            "losses": team_obj.losses,
+            "ties": team_obj.ties,
+            "acquisitions": team_obj.acquisitions,
+            "strengths": strengths,
+            "weaknesses": weaknesses,
+            "punts": punts,
+            "seven_day_stats": seven_day_stats.to_dict("index"),
+            "fifteen_day_stats": fifteen_day_stats.to_dict("index"),
+            "thirty_day_stats": thirty_day_stats.to_dict("index"),
+            "nine_cats": const.NINE_CATS,
+            "all_columns": list(seven_day_stats.columns),
+            "teams": teams,
+            "matchups": matchups_cache,
+            "prev_team": prev_team,
+            "next_team": next_team,
+            "last_update": last_update,
+        },
+    )
+
+
+@app.get("/matchup/{matchup_index}", response_class=HTMLResponse)
+async def matchup_viewer(request: Request, matchup_index: int = 0):
+    """Matchup viewer page showing head-to-head comparisons."""
+    # Use cached box scores
+    box_scores = box_scores_cache
+
+    # Get selected matchup
+    box_score = box_scores[matchup_index]
+
+    # Calculate prev/next matchup indices
+    num_matchups = len(box_scores)
+    prev_matchup = (matchup_index - 1) % num_matchups
+    next_matchup = (matchup_index + 1) % num_matchups
+
+    # Aggregate category scores
+    agg_cat_scores = []
+    for cat, data in box_score.home_stats.items():
+        if cat in const.NINE_CATS:
+            agg_cat_scores.append(
+                {
+                    "name": cat,
+                    "home": round(data["value"], 2),
+                    "away": round(box_score.away_stats[cat]["value"], 2),
+                }
+            )
+
+    # Format matchups for selector
+    matchups = [
+        {"index": i, "label": f"{match.home_team.team_name} vs {match.away_team.team_name}"}
+        for i, match in enumerate(box_scores)
+    ]
+
+    # Get team rankings for this matchup
+    home_rankings = (
+        league_df.loc[league_df["Team"] == box_score.home_team.team_name].to_dict("records")[0]
+        if not league_df[league_df["Team"] == box_score.home_team.team_name].empty
+        else {}
+    )
+    away_rankings = (
+        league_df.loc[league_df["Team"] == box_score.away_team.team_name].to_dict("records")[0]
+        if not league_df[league_df["Team"] == box_score.away_team.team_name].empty
+        else {}
+    )
+
+    # Calculate advantage thresholds based on number of teams
+    num_teams = len(teams)
+    large_advantage_threshold = num_teams // 2  # 6 for 12 teams
+    small_advantage_threshold = num_teams // 4  # 3 for 12 teams
+
+    # Combine category scores with rankings
+    combined_categories = []
+    for cat, data in box_score.home_stats.items():
+        if cat in const.NINE_CATS:
+            home_rank = home_rankings.get(cat, 99)
+            away_rank = away_rankings.get(cat, 99)
+            rank_diff = away_rank - home_rank  # positive = home advantage
+
+            # Determine advantage level
+            if abs(rank_diff) >= large_advantage_threshold:
+                advantage = "large"
+            elif abs(rank_diff) >= small_advantage_threshold:
+                advantage = "small"
+            else:
+                advantage = "even"
+
+            advantage_side = "home" if rank_diff > 0 else "away" if rank_diff < 0 else "none"
+
+            combined_categories.append(
+                {
+                    "name": cat,
+                    "home": round(data["value"], 2),
+                    "away": round(box_score.away_stats[cat]["value"], 2),
+                    "home_rank": home_rank,
+                    "away_rank": away_rank,
+                    "advantage": advantage,
+                    "advantage_side": advantage_side,
+                }
+            )
+
+    return templates.TemplateResponse(
+        "matchup.html",
+        {
+            "request": request,
+            "page_type": "matchup",
+            "home_team": box_score.home_team,
+            "away_team": box_score.away_team,
+            "home_wins": box_score.home_wins,
+            "away_wins": box_score.away_wins,
+            "ties": box_score.home_ties,
+            "combined_categories": combined_categories,
+            "matchups": matchups,
+            "matchups_nav": matchups_cache,
+            "selected_index": matchup_index,
+            "current_week": league_data.currentMatchupPeriod,
+            "teams": teams,
+            "prev_matchup": prev_matchup,
+            "next_matchup": next_matchup,
+            "last_update": last_update,
+        },
+    )
+
+
+@app.get("/trade", response_class=HTMLResponse)
+async def trade_analyzer(request: Request):
+    """Trade analyzer page for comparing player swaps."""
+    # Get all players organized by team
+    players_by_team = be.get_players_by_team(league_data)
+
+    return templates.TemplateResponse(
+        "trade.html",
+        {
+            "request": request,
+            "page_type": "trade",
+            "players_by_team": players_by_team,
+            "teams": teams,
+            "matchups": matchups_cache,
+            "nine_cats": const.NINE_CATS,
+            "last_update": last_update,
+        },
+    )
+
+
+@app.post("/trade/analyze")
+async def analyze_trade(request: Request):
+    """API endpoint to calculate trade impact."""
+    data = await request.json()
+
+    team_a_name = data.get("team_a")
+    team_b_name = data.get("team_b")
+    team_a_player_names = data.get("team_a_players", [])
+    team_b_player_names = data.get("team_b_players", [])
+
+    # Get player data
+    players_by_team = be.get_players_by_team(league_data)
+
+    team_a_players = [
+        p for p in players_by_team.get(team_a_name, []) if p["name"] in team_a_player_names
+    ]
+    team_b_players = [
+        p for p in players_by_team.get(team_b_name, []) if p["name"] in team_b_player_names
+    ]
+
+    # Calculate trade impact
+    # Team A gives their selected players, receives Team B's selected players
+    impact = be.calculate_trade_impact(
+        team_a_gives=team_a_players,
+        team_a_receives=team_b_players,
+        team_b_gives=team_b_players,
+        team_b_receives=team_a_players,
+    )
+
+    return {
+        "impact": impact,
+        "team_a_gives": team_a_players,
+        "team_a_receives": team_b_players,
+        "team_b_gives": team_b_players,
+        "team_b_receives": team_a_players,
+    }
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=5006)
