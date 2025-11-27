@@ -202,5 +202,74 @@ def get_matchup_score_df(matchup: Matchup):
     return combined_df
 
 
+def get_all_players_with_projections(league: League) -> list[dict]:
+    """Get all players from all teams with their projected stats."""
+    all_players = []
+    stat_key = f"{const.YEAR}_projected"
+    
+    for team in league.teams:
+        for player in team.roster:
+            projected = player.stats.get(stat_key, {}).get("avg", {})
+            if projected:
+                player_data = {
+                    "name": player.name,
+                    "player_id": player.playerId,
+                    "team_name": team.team_name,
+                    "position": player.position,
+                    "pro_team": player.proTeam,
+                }
+                # Add all 9 category stats
+                for cat in const.NINE_CATS:
+                    player_data[cat] = round(projected.get(cat, 0), 2)
+                all_players.append(player_data)
+    
+    return all_players
+
+
+def get_players_by_team(league: League) -> dict[str, list[dict]]:
+    """Get players organized by team."""
+    players_by_team = {}
+    all_players = get_all_players_with_projections(league)
+    
+    for player in all_players:
+        team_name = player["team_name"]
+        if team_name not in players_by_team:
+            players_by_team[team_name] = []
+        players_by_team[team_name].append(player)
+    
+    return players_by_team
+
+
+def calculate_trade_impact(
+    team_a_gives: list[dict], 
+    team_a_receives: list[dict],
+    team_b_gives: list[dict],
+    team_b_receives: list[dict]
+) -> dict:
+    """Calculate the impact of a trade on both teams.
+    
+    Returns a dict with category-by-category impact for each team.
+    """
+    impact = {"team_a": {}, "team_b": {}}
+    
+    for cat in const.NINE_CATS:
+        # Team A: loses what they give, gains what they receive
+        team_a_loses = sum(p.get(cat, 0) for p in team_a_gives)
+        team_a_gains = sum(p.get(cat, 0) for p in team_a_receives)
+        team_a_net = team_a_gains - team_a_loses
+        
+        # Team B: loses what they give, gains what they receive
+        team_b_loses = sum(p.get(cat, 0) for p in team_b_gives)
+        team_b_gains = sum(p.get(cat, 0) for p in team_b_receives)
+        team_b_net = team_b_gains - team_b_loses
+        
+        # For TO, negative change is good (fewer turnovers)
+        # Store raw values and let the template handle display
+        impact["team_a"][cat] = round(team_a_net, 2)
+        impact["team_b"][cat] = round(team_b_net, 2)
+    
+    return impact
+
+
 if __name__ == "__main__":
     pass

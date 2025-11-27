@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}Trade Analyzer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .trade-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .trade-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .trade-header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .trade-header p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    /* Two-column team selection */
+    .trade-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .trade-panels {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .trade-panel {
+        background: var(--bg-card);
+        border-radius: 12px;
+        border: 2px solid var(--secondary-silver-dark);
+        overflow: hidden;
+    }
+
+    .trade-panel.team-a {
+        border-color: var(--primary-green);
+    }
+
+    .trade-panel.team-b {
+        border-color: var(--accent-orange);
+    }
+
+    /* Collapsible panel header */
+    .panel-toggle {
+        display: none;
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .panel-header h2 {
+        font-size: 1.1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .trade-panel.team-a .panel-header h2 {
+        color: var(--primary-green);
+    }
+
+    .trade-panel.team-b .panel-header h2 {
+        color: var(--accent-orange);
+    }
+
+    .panel-arrow {
+        width: 20px;
+        height: 20px;
+        color: var(--text-secondary);
+        transition: transform 0.3s ease;
+    }
+
+    .panel-toggle:checked + .panel-header .panel-arrow {
+        transform: rotate(180deg);
+    }
+
+    /* Selected players badge */
+    .selected-count {
+        background: var(--primary-green);
+        color: var(--bg-dark);
+        padding: 0.15rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        display: none;
+    }
+
+    .selected-count.show {
+        display: inline;
+    }
+
+    /* Panel content - collapsible */
+    .panel-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .panel-toggle:checked + .panel-header + .panel-content {
+        max-height: 500px;
+    }
+
+    .panel-content-inner {
+        padding: 0 1.25rem 1.25rem;
+    }
+
+    .trade-panel h2 {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .trade-panel.team-a h2 {
+        color: var(--primary-green);
+    }
+
+    .trade-panel.team-b h2 {
+        color: var(--accent-orange);
+    }
+
+    /* Team selector dropdown */
+    .team-selector {
+        width: 100%;
+        padding: 0.75rem;
+        background: var(--bg-dark);
+        border: 1px solid var(--secondary-silver-dark);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+    }
+
+    .team-selector:focus {
+        outline: none;
+        border-color: var(--primary-green);
+    }
+
+    /* Player list with checkboxes */
+    .player-list {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid var(--secondary-silver-dark);
+        border-radius: 8px;
+        background: var(--bg-dark);
+    }
+
+    .player-item {
+        display: flex;
+        align-items: center;
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid var(--secondary-silver-dark);
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .player-item:last-child {
+        border-bottom: none;
+    }
+
+    .player-item:hover {
+        background: rgba(0, 255, 135, 0.1);
+    }
+
+    .player-item.selected {
+        background: rgba(0, 255, 135, 0.2);
+    }
+
+    .player-item input[type="checkbox"] {
+        margin-right: 0.75rem;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-green);
+    }
+
+    .player-info {
+        flex: 1;
+    }
+
+    .player-name {
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .player-details {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    /* Analyze button */
+    .analyze-btn {
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 2rem;
+        padding: 1rem 2rem;
+        background: var(--primary-green);
+        color: var(--bg-dark);
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .analyze-btn:hover {
+        background: var(--primary-green-dark);
+        transform: translateY(-2px);
+    }
+
+    .analyze-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Results section */
+    .trade-results {
+        display: none;
+        margin-top: 2rem;
+    }
+
+    .trade-results.show {
+        display: block;
+    }
+
+    .results-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .results-header h2 {
+        font-size: 1.4rem;
+        color: var(--primary-green);
+    }
+
+    /* Impact table */
+    .impact-table-container {
+        overflow-x: auto;
+        margin-bottom: 2rem;
+    }
+
+    .impact-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .impact-table th,
+    .impact-table td {
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid var(--secondary-silver-dark);
+    }
+
+    .impact-table th {
+        background: var(--bg-card);
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .impact-table th.team-a-header {
+        color: var(--primary-green);
+    }
+
+    .impact-table th.team-b-header {
+        color: var(--accent-orange);
+    }
+
+    .impact-table td.category {
+        font-weight: 600;
+        text-align: left;
+        padding-left: 1rem;
+    }
+
+    .impact-table .positive {
+        color: var(--primary-green);
+    }
+
+    .impact-table .negative {
+        color: var(--accent-red);
+    }
+
+    .impact-table .neutral {
+        color: var(--text-secondary);
+    }
+
+    /* Player summary cards */
+    .trade-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .trade-summary {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .summary-card {
+        background: var(--bg-card);
+        border-radius: 12px;
+        padding: 1.25rem;
+    }
+
+    .summary-card h3 {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .summary-card.receives h3 {
+        color: var(--primary-green);
+    }
+
+    .summary-card.gives h3 {
+        color: var(--accent-red);
+    }
+
+    .summary-players {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .summary-player {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        background: var(--bg-dark);
+        border-radius: 6px;
+        font-size: 0.85rem;
+    }
+
+    .summary-player-stats {
+        display: flex;
+        gap: 0.75rem;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+    }
+
+    /* No players selected message */
+    .no-selection {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="trade-container">
+    <div class="trade-header">
+        <h1><i data-feather="repeat"></i> Trade Analyzer</h1>
+        <p>Select players from two teams to evaluate a potential trade</p>
+    </div>
+
+    <div class="trade-panels">
+        <!-- Team A Panel -->
+        <div class="trade-panel team-a">
+            <input type="checkbox" id="panel-a-toggle" class="panel-toggle" checked>
+            <label for="panel-a-toggle" class="panel-header">
+                <h2><i data-feather="users"></i> Team A <span class="selected-count" id="team-a-count">0</span></h2>
+                <i data-feather="chevron-down" class="panel-arrow"></i>
+            </label>
+            <div class="panel-content">
+                <div class="panel-content-inner">
+                    <select class="team-selector" id="team-a-selector">
+                        <option value="">Select a team...</option>
+                        {% for team in teams %}
+                        <option value="{{ team }}">{{ team }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="player-list" id="team-a-players">
+                        <div class="no-selection">Select a team to view players</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team B Panel -->
+        <div class="trade-panel team-b">
+            <input type="checkbox" id="panel-b-toggle" class="panel-toggle" checked>
+            <label for="panel-b-toggle" class="panel-header">
+                <h2><i data-feather="users"></i> Team B <span class="selected-count" id="team-b-count">0</span></h2>
+                <i data-feather="chevron-down" class="panel-arrow"></i>
+            </label>
+            <div class="panel-content">
+                <div class="panel-content-inner">
+                    <select class="team-selector" id="team-b-selector">
+                        <option value="">Select a team...</option>
+                        {% for team in teams %}
+                        <option value="{{ team }}">{{ team }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="player-list" id="team-b-players">
+                        <div class="no-selection">Select a team to view players</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="analyze-btn" id="analyze-btn" disabled>
+        <i data-feather="zap"></i> Analyze Trade
+    </button>
+
+    <!-- Results Section -->
+    <div class="trade-results" id="trade-results">
+        <div class="results-header">
+            <h2>Trade Impact Analysis</h2>
+        </div>
+
+        <div class="impact-table-container">
+            <table class="impact-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th class="team-a-header" id="impact-team-a-name">Team A</th>
+                        <th class="team-b-header" id="impact-team-b-name">Team B</th>
+                    </tr>
+                </thead>
+                <tbody id="impact-table-body">
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="trade-summary" id="trade-summary">
+            <!-- Populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Store players data from server
+    const playersByTeam = {{ players_by_team | tojson }};
+    const nineCats = {{ nine_cats | tojson }};
+    
+    // Track selected players
+    let teamAPlayers = [];
+    let teamBPlayers = [];
+
+    // DOM elements
+    const teamASelector = document.getElementById('team-a-selector');
+    const teamBSelector = document.getElementById('team-b-selector');
+    const teamAPlayersList = document.getElementById('team-a-players');
+    const teamBPlayersList = document.getElementById('team-b-players');
+    const teamACount = document.getElementById('team-a-count');
+    const teamBCount = document.getElementById('team-b-count');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const tradeResults = document.getElementById('trade-results');
+
+    // Update selected count badges
+    function updateCounts() {
+        teamACount.textContent = teamAPlayers.length;
+        teamBCount.textContent = teamBPlayers.length;
+        teamACount.classList.toggle('show', teamAPlayers.length > 0);
+        teamBCount.classList.toggle('show', teamBPlayers.length > 0);
+    }
+
+    // Render player list for a team
+    function renderPlayerList(container, teamName, selectedPlayers, onToggle) {
+        const players = playersByTeam[teamName] || [];
+        
+        if (players.length === 0) {
+            container.innerHTML = '<div class="no-selection">No players found</div>';
+            return;
+        }
+
+        container.innerHTML = players.map(player => {
+            const isSelected = selectedPlayers.includes(player.name);
+            return `
+                <label class="player-item ${isSelected ? 'selected' : ''}" data-player="${player.name}">
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} value="${player.name}">
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-details">${player.position} • ${player.pro_team}</div>
+                    </div>
+                </label>
+            `;
+        }).join('');
+
+        // Add click handlers
+        container.querySelectorAll('.player-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const checkbox = item.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+                }
+                onToggle(item.dataset.player, item.querySelector('input').checked);
+                item.classList.toggle('selected', item.querySelector('input').checked);
+                updateAnalyzeButton();
+                updateCounts();
+            });
+        });
+    }
+
+    // Update analyze button state
+    function updateAnalyzeButton() {
+        const hasTeamA = teamASelector.value && teamAPlayers.length > 0;
+        const hasTeamB = teamBSelector.value && teamBPlayers.length > 0;
+        analyzeBtn.disabled = !(hasTeamA && hasTeamB);
+    }
+
+    // Team A selector change
+    teamASelector.addEventListener('change', () => {
+        teamAPlayers = [];
+        updateCounts();
+        renderPlayerList(teamAPlayersList, teamASelector.value, teamAPlayers, (name, checked) => {
+            if (checked) {
+                teamAPlayers.push(name);
+            } else {
+                teamAPlayers = teamAPlayers.filter(p => p !== name);
+            }
+        });
+        updateAnalyzeButton();
+        tradeResults.classList.remove('show');
+    });
+
+    // Team B selector change
+    teamBSelector.addEventListener('change', () => {
+        teamBPlayers = [];
+        updateCounts();
+        renderPlayerList(teamBPlayersList, teamBSelector.value, teamBPlayers, (name, checked) => {
+            if (checked) {
+                teamBPlayers.push(name);
+            } else {
+                teamBPlayers = teamBPlayers.filter(p => p !== name);
+            }
+        });
+        updateAnalyzeButton();
+        tradeResults.classList.remove('show');
+    });
+
+    // Analyze trade
+    analyzeBtn.addEventListener('click', async () => {
+        analyzeBtn.disabled = true;
+        analyzeBtn.innerHTML = '<i data-feather="loader"></i> Analyzing...';
+        
+        try {
+            const response = await fetch('/trade/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    team_a: teamASelector.value,
+                    team_b: teamBSelector.value,
+                    team_a_players: teamAPlayers,
+                    team_b_players: teamBPlayers
+                })
+            });
+            
+            const data = await response.json();
+            renderResults(data);
+            tradeResults.classList.add('show');
+            tradeResults.scrollIntoView({ behavior: 'smooth' });
+            
+        } catch (error) {
+            console.error('Error analyzing trade:', error);
+            alert('Error analyzing trade. Please try again.');
+        } finally {
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = '<i data-feather="zap"></i> Analyze Trade';
+            feather.replace();
+        }
+    });
+
+    // Render results
+    function renderResults(data) {
+        const { impact, team_a_gives, team_a_receives, team_b_gives, team_b_receives } = data;
+        
+        // Update team names in header
+        document.getElementById('impact-team-a-name').textContent = teamASelector.value;
+        document.getElementById('impact-team-b-name').textContent = teamBSelector.value;
+        
+        // Render impact table
+        const tbody = document.getElementById('impact-table-body');
+        tbody.innerHTML = nineCats.map(cat => {
+            const teamAImpact = impact.team_a[cat];
+            const teamBImpact = impact.team_b[cat];
+            
+            // For TO, negative is good (fewer turnovers)
+            const isTurnover = cat === 'TO';
+            
+            const getClass = (val, isTurnover) => {
+                if (val === 0) return 'neutral';
+                if (isTurnover) {
+                    return val < 0 ? 'positive' : 'negative';
+                }
+                return val > 0 ? 'positive' : 'negative';
+            };
+            
+            const formatVal = (val) => {
+                if (val === 0) return '0';
+                const sign = val > 0 ? '+' : '';
+                return sign + val.toFixed(2);
+            };
+            
+            return `
+                <tr>
+                    <td class="category">${cat}</td>
+                    <td class="${getClass(teamAImpact, isTurnover)}">${formatVal(teamAImpact)}</td>
+                    <td class="${getClass(teamBImpact, isTurnover)}">${formatVal(teamBImpact)}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        // Render trade summary
+        const summaryContainer = document.getElementById('trade-summary');
+        summaryContainer.innerHTML = `
+            <div class="summary-card receives">
+                <h3><i data-feather="arrow-down-circle"></i> ${teamASelector.value} Receives</h3>
+                <div class="summary-players">
+                    ${team_a_receives.map(p => `
+                        <div class="summary-player">
+                            <span>${p.name}</span>
+                            <span class="summary-player-stats">
+                                <span>${p.PTS} PTS</span>
+                                <span>${p.REB} REB</span>
+                                <span>${p.AST} AST</span>
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="summary-card receives">
+                <h3><i data-feather="arrow-down-circle"></i> ${teamBSelector.value} Receives</h3>
+                <div class="summary-players">
+                    ${team_b_receives.map(p => `
+                        <div class="summary-player">
+                            <span>${p.name}</span>
+                            <span class="summary-player-stats">
+                                <span>${p.PTS} PTS</span>
+                                <span>${p.REB} REB</span>
+                                <span>${p.AST} AST</span>
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        feather.replace();
+    }
+</script>
+{% endblock %}
