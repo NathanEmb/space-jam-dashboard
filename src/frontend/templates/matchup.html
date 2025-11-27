@@ -168,12 +168,15 @@
         padding: 0.5rem 0.25rem;
         background-color: rgba(0, 0, 0, 0.15);
         white-space: nowrap;
+        vertical-align: middle;
     }
 
     .rank-cell-content {
         display: inline-flex;
         align-items: center;
-        gap: 0.15rem;
+        justify-content: center;
+        gap: 0.2rem;
+        height: 100%;
     }
 
     .rank-left {
@@ -198,6 +201,7 @@
         font-size: 0.9rem;
         color: var(--text-secondary);
         opacity: 0.7;
+        line-height: 1;
     }
 
     .stat-cell.has-advantage {
@@ -205,10 +209,21 @@
     }
 
     .advantage-arrow {
-        font-size: 1.5rem;
+        display: inline-flex;
+        align-items: center;
         opacity: 0.85;
-        line-height: 1;
-        font-weight: bold;
+    }
+
+    .advantage-arrow svg {
+        width: 14px;
+        height: 14px;
+        stroke-width: 2.5;
+    }
+
+    .advantage-arrow.large svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 3;
     }
 
     .advantage-arrow.large {
@@ -393,9 +408,9 @@
                 <td class="rank-cell rank-left">
                     <span class="rank-cell-content">
                         {% if cat.advantage_side == 'home' and cat.advantage == 'large' %}
-                        <span class="advantage-arrow large home-advantage">&laquo;</span>
+                        <span class="advantage-arrow large home-advantage"><i data-feather="chevrons-left"></i></span>
                         {% elif cat.advantage_side == 'home' and cat.advantage == 'small' %}
-                        <span class="advantage-arrow home-advantage">&lsaquo;</span>
+                        <span class="advantage-arrow home-advantage"><i data-feather="chevron-left"></i></span>
                         {% endif %}
                         <span class="rank-indicator">#{{ cat.home_rank }}</span>
                     </span>
@@ -405,9 +420,9 @@
                     <span class="rank-cell-content">
                         <span class="rank-indicator">#{{ cat.away_rank }}</span>
                         {% if cat.advantage_side == 'away' and cat.advantage == 'large' %}
-                        <span class="advantage-arrow large away-advantage">&raquo;</span>
+                        <span class="advantage-arrow large away-advantage"><i data-feather="chevrons-right"></i></span>
                         {% elif cat.advantage_side == 'away' and cat.advantage == 'small' %}
-                        <span class="advantage-arrow away-advantage">&rsaquo;</span>
+                        <span class="advantage-arrow away-advantage"><i data-feather="chevron-right"></i></span>
                         {% endif %}
                     </span>
                 </td>
