@@ -59,20 +59,12 @@
             height: 3px;
             background-color: var(--text-primary);
             border-radius: 2px;
-            transition: all 0.3s ease;
         }
 
-        /* Hamburger animation when checked */
-        #menu-toggle:checked + .hamburger span:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
-        }
-
-        #menu-toggle:checked + .hamburger span:nth-child(2) {
+        /* Hide hamburger when sidebar is open */
+        #menu-toggle:checked + .hamburger {
             opacity: 0;
-        }
-
-        #menu-toggle:checked + .hamburger span:nth-child(3) {
-            transform: rotate(-45deg) translate(6px, -6px);
+            pointer-events: none;
         }
 
         /* Sidebar */
@@ -89,7 +81,6 @@
             z-index: 1000;
             overflow-y: auto;
             overscroll-behavior: contain;
-            padding-top: 80px;
         }
 
         #menu-toggle:checked ~ .sidebar-nav {
@@ -117,6 +108,9 @@
 
         /* Sidebar content */
         .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--secondary-silver-dark);
             margin-bottom: 1rem;
@@ -126,6 +120,38 @@
             color: var(--primary-green);
             font-size: 1.2rem;
             margin: 0;
+        }
+
+        /* Sidebar close button - same animation as hamburger */
+        .sidebar-close {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 28px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .sidebar-close span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Always show as X since sidebar is open when visible */
+        .sidebar-close span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .sidebar-close span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .sidebar-close span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         .sidebar-section {
@@ -387,6 +413,11 @@
                 <aside class="sidebar-nav">
                     <div class="sidebar-header">
                         <h2>Navigation</h2>
+                        <label for="menu-toggle" class="sidebar-close">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </label>
                     </div>
                     
                     <div class="sidebar-section">
@@ -450,16 +481,23 @@
         const nav = document.querySelector('nav');
         let lastScrollY = window.scrollY;
         let ticking = false;
+        let scrollUpDistance = 0;
+        const showThreshold = 50; // Need to scroll up this many pixels to show nav
 
         function updateNav() {
             const currentScrollY = window.scrollY;
+            const scrollDelta = lastScrollY - currentScrollY;
             
             if (currentScrollY > lastScrollY && currentScrollY > 80) {
                 // Scrolling down & past threshold - hide nav
                 nav.classList.add('nav-hidden');
-            } else {
-                // Scrolling up - show nav
-                nav.classList.remove('nav-hidden');
+                scrollUpDistance = 0;
+            } else if (currentScrollY < lastScrollY) {
+                // Scrolling up - accumulate distance
+                scrollUpDistance += scrollDelta;
+                if (scrollUpDistance >= showThreshold || currentScrollY <= 80) {
+                    nav.classList.remove('nav-hidden');
+                }
             }
             
             lastScrollY = currentScrollY;
