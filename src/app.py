@@ -31,14 +31,16 @@ league_data = None
 league_df = None
 teams = None
 last_update = None
+box_scores_cache = None
 
 
 async def refresh_league_data():
     """Refresh league data from ESPN API."""
-    global league_data, league_df, teams, last_update
+    global league_data, league_df, teams, last_update, box_scores_cache
     league_data = be.get_league()
     league_df = be.get_league_cat_data_rankings(league_data)
     teams = [team.team_name for team in league_data.teams]
+    box_scores_cache = be.get_league_box_scores(league_data)
     last_update = datetime.now()
     logger.info(f"League data refreshed at {last_update}")
 
@@ -78,20 +80,12 @@ templates = Jinja2Templates(directory="src/frontend/templates")
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """Main dashboard page with category rankings."""
-    # Get AI joke
-    try:
-        joke = be.get_mainpage_joke()
-    except Exception:
-        joke = "The bots broke.."
-
-    # Prepare league data for template
     league_df_dict = league_df.to_dict("records")
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "joke": joke,
             "league_data": league_df_dict,
             "columns": list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys()),
             "teams": teams,
@@ -124,12 +118,6 @@ async def team_viewer(request: Request, team_name: str):
     chart_img = base64.b64encode(img_buffer.read()).decode()
     plt.close(fig)
 
-    # Get AI joke about team
-    try:
-        team_joke = be.get_teamviewer_joke(team_name)
-    except Exception:
-        team_joke = "The bots broke.."
-
     return templates.TemplateResponse(
         "team.html",
         {
@@ -152,7 +140,6 @@ async def team_viewer(request: Request, team_name: str):
             "nine_cats": const.NINE_CATS,
             "all_columns": list(seven_day_stats.columns),
             "teams": teams,
-            "team_joke": team_joke,
         },
     )
 
@@ -160,7 +147,8 @@ async def team_viewer(request: Request, team_name: str):
 @app.get("/matchup/{matchup_index}", response_class=HTMLResponse)
 async def matchup_viewer(request: Request, matchup_index: int = 0):
     """Matchup viewer page showing head-to-head comparisons."""
-    box_scores = be.get_league_box_scores(league_data)
+    # Use cached box scores
+    box_scores = box_scores_cache
 
     # Get selected matchup
     box_score = box_scores[matchup_index]

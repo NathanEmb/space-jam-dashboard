@@ -23,16 +23,6 @@
         margin-bottom: 1rem;
     }
 
-    .ai-joke {
-        background-color: var(--bg-card);
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid var(--primary-green);
-        font-style: italic;
-        color: var(--text-secondary);
-        margin-top: 1rem;
-    }
-
     .section-header {
         margin: 2rem 0 1rem 0;
     }
@@ -211,16 +201,10 @@
 <div class="main-content">
     <div class="page-header">
         <h1>Space Jammers Lounge</h1>
-        <p>Fantasy Basketball League Dashboard</p>
     </div>
 
     <div class="welcome-section">
-        <h2>Welcome to the Space Jammers Lounge</h2>
         <p>Written by the Tatums</p>
-        <div class="ai-joke">
-            <strong>AI-Powered Joke:</strong><br>
-            {{ joke }}
-        </div>
     </div>
 
     <div class="quick-links">
@@ -268,14 +252,11 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
 
     <div style="margin-top: 2rem; padding: 1rem; background-color: var(--bg-dark); border-radius: 8px; border: 1px solid var(--secondary-silver-dark);">
-        <h3>About This Dashboard</h3>
-        <p>A site to lookup fantasy basketball rankings for Space Jammers league. Data is updated hourly.</p>
-        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">
-            Tap team names to view detailed stats • Swipe tables to see all data
-        </p>
+    <div class="credit">
+        <p>Written by the Tatums</p>
+    </div>
     </div>
 </div>
 
