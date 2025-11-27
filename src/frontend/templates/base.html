@@ -192,8 +192,14 @@
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             border-bottom: 3px solid var(--primary-green);
-            position: relative;
+            position: sticky;
+            top: 0;
             z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        nav.nav-hidden {
+            transform: translateY(-100%);
         }
 
         .nav-content {
@@ -362,6 +368,48 @@
     <!-- Feather Icons -->
     <script src="https://unpkg.com/feather-icons"></script>
     <script>feather.replace();</script>
+
+    <!-- Scroll-up-to-reveal nav -->
+    <script>
+    (function() {
+        const nav = document.querySelector('nav');
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+
+        function updateNav() {
+            const currentScrollY = window.scrollY;
+            
+            // Only apply hide/show behavior on mobile
+            if (window.innerWidth <= 768) {
+                if (currentScrollY > lastScrollY && currentScrollY > 80) {
+                    // Scrolling down & past threshold - hide nav
+                    nav.classList.add('nav-hidden');
+                } else {
+                    // Scrolling up - show nav
+                    nav.classList.remove('nav-hidden');
+                }
+            } else {
+                // Always show on desktop
+                nav.classList.remove('nav-hidden');
+            }
+            
+            lastScrollY = currentScrollY;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(updateNav);
+                ticking = true;
+            }
+        });
+
+        // Reset on resize
+        window.addEventListener('resize', function() {
+            nav.classList.remove('nav-hidden');
+        });
+    })();
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>
