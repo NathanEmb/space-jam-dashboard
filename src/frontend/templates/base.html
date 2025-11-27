@@ -451,17 +451,11 @@
         function updateNav() {
             const currentScrollY = window.scrollY;
             
-            // Only apply hide/show behavior on mobile
-            if (window.innerWidth <= 768) {
-                if (currentScrollY > lastScrollY && currentScrollY > 80) {
-                    // Scrolling down & past threshold - hide nav
-                    nav.classList.add('nav-hidden');
-                } else {
-                    // Scrolling up - show nav
-                    nav.classList.remove('nav-hidden');
-                }
+            if (currentScrollY > lastScrollY && currentScrollY > 80) {
+                // Scrolling down & past threshold - hide nav
+                nav.classList.add('nav-hidden');
             } else {
-                // Always show on desktop
+                // Scrolling up - show nav
                 nav.classList.remove('nav-hidden');
             }
             
@@ -474,11 +468,6 @@
                 requestAnimationFrame(updateNav);
                 ticking = true;
             }
-        });
-
-        // Reset on resize
-        window.addEventListener('resize', function() {
-            nav.classList.remove('nav-hidden');
         });
     })();
     </script>
