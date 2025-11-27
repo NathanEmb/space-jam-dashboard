@@ -175,6 +175,64 @@
             color: var(--bg-dark);
         }
 
+        /* Collapsible submenu in sidebar */
+        .sidebar-submenu {
+            display: none;
+            list-style: none;
+            padding-left: 1.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .sidebar-submenu a {
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+        }
+
+        .submenu-toggle {
+            display: none;
+        }
+
+        .submenu-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .submenu-trigger:hover {
+            background-color: var(--primary-green);
+            color: var(--bg-dark);
+        }
+
+        .submenu-trigger span {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .submenu-trigger .feather {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .submenu-arrow {
+            transition: transform 0.2s ease;
+        }
+
+        .submenu-toggle:checked ~ .sidebar-submenu {
+            display: block;
+        }
+
+        .submenu-toggle:checked + .submenu-trigger .submenu-arrow {
+            transform: rotate(180deg);
+        }
+
         /* Team list in sidebar */
         .team-list {
             max-height: 300px;
@@ -332,16 +390,30 @@
                         <h3>Menu</h3>
                         <ul class="sidebar-links">
                             <li><a href="/"><i data-feather="home"></i> Home</a></li>
-                            <li><a href="/matchup/0"><i data-feather="target"></i> Matchups</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <h3>Teams</h3>
-                        <ul class="sidebar-links team-list">
-                            {% for team in teams %}
-                            <li><a href="/team/{{ team | urlencode }}">{{ team }}</a></li>
-                            {% endfor %}
+                            <li>
+                                <input type="checkbox" id="matchups-submenu" class="submenu-toggle">
+                                <label for="matchups-submenu" class="submenu-trigger">
+                                    <span><i data-feather="target"></i> Matchups</span>
+                                    <i data-feather="chevron-down" class="submenu-arrow"></i>
+                                </label>
+                                <ul class="sidebar-submenu">
+                                    {% for matchup in matchups %}
+                                    <li><a href="/matchup/{{ matchup.index }}">{{ matchup.label }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="teams-submenu" class="submenu-toggle">
+                                <label for="teams-submenu" class="submenu-trigger">
+                                    <span><i data-feather="users"></i> Teams</span>
+                                    <i data-feather="chevron-down" class="submenu-arrow"></i>
+                                </label>
+                                <ul class="sidebar-submenu team-list">
+                                    {% for team in teams %}
+                                    <li><a href="/team/{{ team | urlencode }}">{{ team }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </aside>

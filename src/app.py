@@ -25,15 +25,21 @@ league_df = None
 teams = None
 last_update = None
 box_scores_cache = None
+matchups_cache = None
 
 
 async def refresh_league_data():
     """Refresh league data from ESPN API."""
-    global league_data, league_df, teams, last_update, box_scores_cache
+    global league_data, league_df, teams, last_update, box_scores_cache, matchups_cache
     league_data = be.get_league()
     league_df = be.get_league_cat_data_rankings(league_data)
     teams = [team.team_name for team in league_data.teams]
     box_scores_cache = be.get_league_box_scores(league_data)
+    # Pre-format matchups for sidebar navigation
+    matchups_cache = [
+        {"index": i, "label": f"{match.home_team.team_name} vs {match.away_team.team_name}"}
+        for i, match in enumerate(box_scores_cache)
+    ]
     last_update = datetime.now()
     logger.info(f"League data refreshed at {last_update}")
 
@@ -82,6 +88,7 @@ async def home(request: Request):
             "league_data": league_df_dict,
             "columns": list(const.CAT_ONLY_DATA_RANKED_TABLE_DEF.keys()),
             "teams": teams,
+            "matchups": matchups_cache,
         },
     )
 
@@ -121,6 +128,7 @@ async def team_viewer(request: Request, team_name: str):
             "nine_cats": const.NINE_CATS,
             "all_columns": list(seven_day_stats.columns),
             "teams": teams,
+            "matchups": matchups_cache,
         },
     )
 
@@ -185,6 +193,7 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
             "ties": box_score.home_ties,
             "matchup_scores": agg_cat_scores,
             "matchups": matchups,
+            "matchups_nav": matchups_cache,
             "selected_index": matchup_index,
             "current_week": league_data.currentMatchupPeriod,
             "teams": teams,
