@@ -130,10 +130,10 @@
 
     .category-table th,
     .category-table td {
-        padding: 0.75rem 0.5rem;
+        padding: 1.2rem 0.9rem;
         text-align: center;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        font-size: 0.9rem;
+        font-size: 1.25rem;
     }
 
     .category-table th {
@@ -146,7 +146,7 @@
         background-color: var(--bg-dark);
         font-weight: 600;
         color: var(--text-primary);
-        width: 60px;
+        width: 80px;
     }
 
     .stat-cell {
@@ -168,8 +168,8 @@
     }
 
     .rank-cell {
-        width: 60px;
-        padding: 0.5rem 0.25rem;
+        width: 75px;
+        padding: 0.75rem 0.5rem;
         background-color: rgba(0, 0, 0, 0.15);
         white-space: nowrap;
         vertical-align: middle;
@@ -272,8 +272,8 @@
 
         .category-table th,
         .category-table td {
-            padding: 0.5rem 0.25rem;
-            font-size: 0.8rem;
+            padding: 0.9rem 0.65rem;
+            font-size: 1.1rem;
         }
 
         /* Show mobile selector, hide desktop list */
@@ -299,36 +299,36 @@
 
     @media (max-width: 480px) {
         .score-card {
-            padding: 0.5rem;
-            gap: 0.5rem;
+            padding: 0.75rem;
+            gap: 0.75rem;
         }
 
         .team img {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
         }
 
         .team-name {
-            font-size: 0.7rem;
+            font-size: 0.85rem;
         }
 
         .score {
-            font-size: 1rem;
+            font-size: 1.2rem;
         }
 
         .category-table th,
         .category-table td {
-            padding: 0.4rem 0.2rem;
-            font-size: 0.75rem;
+            padding: 0.85rem 0.5rem;
+            font-size: 1.05rem;
         }
 
         .rank-cell {
-            width: 45px;
-            padding: 0.4rem 0.1rem;
+            width: 60px;
+            padding: 0.6rem 0.3rem;
         }
 
         .rank-indicator {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             vertical-align: middle;
         }
 
@@ -380,8 +380,8 @@
         <tbody>
             {% for cat in combined_categories %}
             <tr>
-                <td class="stat-cell stat-left {% if cat.advantage_side == 'home' %}has-advantage{% endif %}">
-                    <span class="stat-value {% if (cat.name == 'TO' and cat.home < cat.away) or (cat.name != 'TO' and cat.home > cat.away) %}stat-winning{% endif %}">
+                <td class="stat-cell stat-left {% if (cat.name == 'TO' and cat.home < cat.away) or (cat.name != 'TO' and cat.home > cat.away) %}has-advantage{% endif %}">
+                    <span class="stat-value">
                         {{ cat.home }}
                     </span>
                 </td>
@@ -406,8 +406,8 @@
                         {% endif %}
                     </span>
                 </td>
-                <td class="stat-cell stat-right {% if cat.advantage_side == 'away' %}has-advantage{% endif %}">
-                    <span class="stat-value {% if (cat.name == 'TO' and cat.away < cat.home) or (cat.name != 'TO' and cat.away > cat.home) %}stat-winning{% endif %}">
+                <td class="stat-cell stat-right {% if (cat.name == 'TO' and cat.away < cat.home) or (cat.name != 'TO' and cat.away > cat.home) %}has-advantage{% endif %}">
+                    <span class="stat-value">
                         {{ cat.away }}
                     </span>
                 </td>
