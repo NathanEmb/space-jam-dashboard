@@ -1,23 +1,16 @@
 """FastAPI application for Space Jammers Dashboard."""
 
 import asyncio
-import base64
-import io
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-import matplotlib
-
-matplotlib.use("Agg")  # Set non-interactive backend
-import matplotlib.pyplot as plt
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 import src.backend as be
 import src.constants as const
-from src.frontend.figures import create_cat_bar_charts
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -102,21 +95,10 @@ async def team_viewer(request: Request, team_name: str):
     seven_day_stats = be.get_average_team_stats(team_obj, 7)
     fifteen_day_stats = be.get_average_team_stats(team_obj, 15)
     thirty_day_stats = be.get_average_team_stats(team_obj, 30)
-    agg_stats = be.agg_player_avgs(seven_day_stats, fifteen_day_stats, thirty_day_stats)
 
     # Get team breakdown
     team_data = league_df.loc[league_df["Team"] == team_name].to_dict("records")[0]
     strengths, weaknesses, punts = be.get_team_breakdown(team_data)
-
-    # Generate chart
-    fig = create_cat_bar_charts(agg_stats.T)
-
-    # Convert figure to base64 encoded image
-    img_buffer = io.BytesIO()
-    fig.savefig(img_buffer, format="png", bbox_inches="tight")
-    img_buffer.seek(0)
-    chart_img = base64.b64encode(img_buffer.read()).decode()
-    plt.close(fig)
 
     return templates.TemplateResponse(
         "team.html",
@@ -133,7 +115,6 @@ async def team_viewer(request: Request, team_name: str):
             "strengths": strengths,
             "weaknesses": weaknesses,
             "punts": punts,
-            "chart_img": chart_img,
             "seven_day_stats": seven_day_stats.to_dict("index"),
             "fifteen_day_stats": fifteen_day_stats.to_dict("index"),
             "thirty_day_stats": thirty_day_stats.to_dict("index"),
