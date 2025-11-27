@@ -16,6 +16,7 @@
             --bg-card: #2A2A2A;
             --text-primary: #FAFAFA;
             --text-secondary: #CCCCCC;
+            --sidebar-width: 280px;
         }
 
         * {
@@ -37,12 +38,154 @@
             padding: 20px;
         }
 
-        /* Navigation */
+        /* ========== Hamburger Menu (CSS-only) ========== */
+        #menu-toggle {
+            display: none;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 28px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hamburger animation when checked */
+        #menu-toggle:checked + .hamburger span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        #menu-toggle:checked + .hamburger span:nth-child(2) {
+            opacity: 0;
+        }
+
+        #menu-toggle:checked + .hamburger span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Sidebar */
+        .sidebar-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--bg-card);
+            border-right: 3px solid var(--primary-green);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            padding-top: 80px;
+        }
+
+        #menu-toggle:checked ~ .sidebar-nav {
+            transform: translateX(0);
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 999;
+        }
+
+        #menu-toggle:checked ~ .sidebar-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sidebar content */
+        .sidebar-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--secondary-silver-dark);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            color: var(--primary-green);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .sidebar-section {
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-section h3 {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-links {
+            list-style: none;
+        }
+
+        .sidebar-links li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background-color: var(--primary-green);
+            color: var(--bg-dark);
+        }
+
+        .sidebar-links a.active {
+            background-color: var(--primary-green-dark);
+            color: var(--bg-dark);
+        }
+
+        /* Team list in sidebar */
+        .team-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .team-list a {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+
+        /* Navigation Bar */
         nav {
             background-color: var(--bg-card);
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             border-bottom: 3px solid var(--primary-green);
+            position: relative;
+            z-index: 1001;
         }
 
         .nav-content {
@@ -51,13 +194,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         .nav-logo {
             display: flex;
             align-items: center;
             gap: 1rem;
+            text-decoration: none;
         }
 
         .nav-logo img {
@@ -69,78 +218,14 @@
         .nav-logo h1 {
             font-size: 1.5rem;
             color: var(--primary-green);
+            margin: 0;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-primary);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .nav-links a:hover {
-            background-color: var(--primary-green);
-            color: var(--bg-dark);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .sidebar h3 {
-            color: var(--primary-green);
-            margin-bottom: 1rem;
-        }
-
-        .sidebar-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .sidebar-section h4 {
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .sidebar-joke {
-            background-color: var(--bg-dark);
-            padding: 1rem;
-            border-radius: 8px;
-            font-style: italic;
-            color: var(--text-secondary);
-        }
-
-        /* Team selector */
-        .team-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .team-selector a {
-            color: var(--text-primary);
-            text-decoration: none;
-            padding: 0.5rem;
-            border-radius: 4px;
-            background-color: var(--bg-dark);
-            transition: background-color 0.3s;
-        }
-
-        .team-selector a:hover,
-        .team-selector a.active {
-            background-color: var(--primary-green);
-            color: var(--bg-dark);
+        /* Hide logo text on mobile */
+        @media (max-width: 600px) {
+            .nav-logo h1 {
+                display: none;
+            }
         }
 
         /* Main content */
@@ -186,19 +271,12 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                width: 100%;
-                gap: 0.5rem;
-            }
-
             .container {
                 padding: 10px;
+            }
+            
+            .main-content {
+                padding: 1rem;
             }
         }
     </style>
@@ -207,15 +285,47 @@
 <body>
     <nav>
         <div class="nav-content">
-            <div class="nav-logo">
-                <img src="https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg" alt="Space Jammers Logo">
-                <h1>Space Jammers Lounge</h1>
+            <div class="nav-left">
+                <!-- Hamburger Menu Toggle -->
+                <input type="checkbox" id="menu-toggle">
+                <label for="menu-toggle" class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </label>
+
+                <!-- Sidebar Navigation -->
+                <aside class="sidebar-nav">
+                    <div class="sidebar-header">
+                        <h2>Navigation</h2>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <h3>Menu</h3>
+                        <ul class="sidebar-links">
+                            <li><a href="/">🏠 Home</a></li>
+                            <li><a href="/matchup/0">🏀 Matchups</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3>Teams</h3>
+                        <ul class="sidebar-links team-list">
+                            {% for team in teams %}
+                            <li><a href="/team/{{ team | urlencode }}">{{ team }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Overlay to close sidebar -->
+                <label for="menu-toggle" class="sidebar-overlay"></label>
+
+                <a href="/" class="nav-logo">
+                    <img src="https://spacejam-dashboard.s3.us-east-2.amazonaws.com/assets/the-last-spacejam.jpg" alt="Space Jammers Logo">
+                    <h1>Space Jammers Lounge</h1>
+                </a>
             </div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="#" onclick="showTeamMenu()">Teams</a></li>
-                <li><a href="/matchup/0">Matchups</a></li>
-            </ul>
         </div>
     </nav>
 
@@ -223,13 +333,6 @@
         {% block content %}{% endblock %}
     </div>
 
-    <script>
-        function showTeamMenu() {
-            const teams = {{ teams | tojson }};
-            const menu = teams.map(team => `<a href="/team/${encodeURIComponent(team)}">${team}</a>`).join('<br>');
-            alert('Teams:\n' + teams.join('\n'));
-        }
-    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
