@@ -444,8 +444,10 @@
             <table class="impact-table">
                 <thead>
                     <tr>
-                        <th>Category</th>
                         <th class="team-a-header" id="impact-team-a-name">Team A</th>
+                        <th>Rank</th>
+                        <th>Category</th>
+                        <th>Rank</th>
                         <th class="team-b-header" id="impact-team-b-name">Team B</th>
                     </tr>
                 </thead>
@@ -596,42 +598,59 @@
 
     // Render results
     function renderResults(data) {
-        const { impact, team_a_gives, team_a_receives, team_b_gives, team_b_receives } = data;
-        
+        const { impact, team_a_gives, team_a_receives, team_b_gives, team_b_receives, team_a_ranks, team_b_ranks } = data;
+
         // Update team names in header
         document.getElementById('impact-team-a-name').textContent = teamASelector.value;
         document.getElementById('impact-team-b-name').textContent = teamBSelector.value;
-        
-        // Render impact table
+
+        // Render impact table with league ranks
         const tbody = document.getElementById('impact-table-body');
-        tbody.innerHTML = nineCats.map(cat => {
-            const teamAImpact = impact.team_a[cat];
-            const teamBImpact = impact.team_b[cat];
-            
-            // For TO, negative is good (fewer turnovers)
-            const isTurnover = cat === 'TO';
-            
-            const getClass = (val, isTurnover) => {
-                if (val === 0) return 'neutral';
-                if (isTurnover) {
-                    return val < 0 ? 'positive' : 'negative';
-                }
-                return val > 0 ? 'positive' : 'negative';
-            };
-            
-            const formatVal = (val) => {
-                if (val === 0) return '0';
-                const sign = val > 0 ? '+' : '';
-                return sign + val.toFixed(2);
-            };
-            
-            return `
-                <tr>
-                    <td class="category">${cat}</td>
-                    <td class="${getClass(teamAImpact, isTurnover)}">${formatVal(teamAImpact)}</td>
-                    <td class="${getClass(teamBImpact, isTurnover)}">${formatVal(teamBImpact)}</td>
-                </tr>
-            `;
+            tbody.innerHTML = nineCats.map(cat => {
+                const teamAImpact = impact.team_a[cat];
+                const teamBImpact = impact.team_b[cat];
+                const teamARank = team_a_ranks ? team_a_ranks[cat] : null;
+                const teamBRank = team_b_ranks ? team_b_ranks[cat] : null;
+
+                // For TO, negative is good (fewer turnovers)
+                const isTurnover = cat === 'TO';
+
+                const getClass = (val, isTurnover) => {
+                    if (val === 0) return 'neutral';
+                    if (isTurnover) {
+                        return val < 0 ? 'positive' : 'negative';
+                    }
+                    return val > 0 ? 'positive' : 'negative';
+                };
+
+                const formatVal = (val) => {
+                    if (val === 0) return '0';
+                    const sign = val > 0 ? '+' : '';
+                    return sign + val.toFixed(2);
+                };
+
+                // Show rank as #X, fallback to "--" if missing
+                const formatRank = (rank) => rank !== undefined && rank !== null ? `#${rank}` : '--';
+
+                return `
+                    <tr>
+                        <td class="stat-cell stat-left ${getClass(teamAImpact, isTurnover)}">
+                            <span class="stat-value">${formatVal(teamAImpact)}</span>
+                        </td>
+                        <td class="rank-cell rank-left">
+                            <span class="rank-cell-content"><span class="rank-indicator">${formatRank(teamARank)}</span></span>
+                        </td>
+                        <td class="category-name-cell">
+                            <span class="category-label">${cat}</span>
+                        </td>
+                        <td class="rank-cell rank-right">
+                            <span class="rank-cell-content"><span class="rank-indicator">${formatRank(teamBRank)}</span></span>
+                        </td>
+                        <td class="stat-cell stat-right ${getClass(teamBImpact, isTurnover)}">
+                            <span class="stat-value">${formatVal(teamBImpact)}</span>
+                        </td>
+                    </tr>
+                `;
         }).join('');
         
         // Render trade summary

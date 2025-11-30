@@ -308,7 +308,6 @@ async def analyze_trade(request: Request):
     ]
 
     # Calculate trade impact
-    # Team A gives their selected players, receives Team B's selected players
     impact = be.calculate_trade_impact(
         team_a_gives=team_a_players,
         team_a_receives=team_b_players,
@@ -316,12 +315,26 @@ async def analyze_trade(request: Request):
         team_b_receives=team_a_players,
     )
 
+    # Get current league-wide category rankings for both teams
+    team_a_ranks = {}
+    team_b_ranks = {}
+    if team_a_name in league_df["Team"].values:
+        team_a_row = league_df.loc[league_df["Team"] == team_a_name].to_dict("records")[0]
+        for cat in const.NINE_CATS:
+            team_a_ranks[cat] = team_a_row.get(cat, None)
+    if team_b_name in league_df["Team"].values:
+        team_b_row = league_df.loc[league_df["Team"] == team_b_name].to_dict("records")[0]
+        for cat in const.NINE_CATS:
+            team_b_ranks[cat] = team_b_row.get(cat, None)
+
     return {
         "impact": impact,
         "team_a_gives": team_a_players,
         "team_a_receives": team_b_players,
         "team_b_gives": team_b_players,
         "team_b_receives": team_a_players,
+        "team_a_ranks": team_a_ranks,
+        "team_b_ranks": team_b_ranks,
     }
 
 
