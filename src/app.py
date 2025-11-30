@@ -211,8 +211,8 @@ async def matchup_viewer(request: Request, matchup_index: int = 0):
 
     # Calculate advantage thresholds based on number of teams
     num_teams = len(teams)
-    large_advantage_threshold = num_teams // 2  # 6 for 12 teams
-    small_advantage_threshold = num_teams // 4  # 3 for 12 teams
+    large_advantage_threshold = num_teams // 3  # 4 for 12 teams
+    small_advantage_threshold = 1
 
     # Combine category scores with rankings
     combined_categories = []
