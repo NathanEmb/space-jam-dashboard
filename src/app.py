@@ -2,9 +2,12 @@
 
 import asyncio
 import logging
+import os
+import zoneinfo
 from contextlib import asynccontextmanager
 from datetime import datetime
 
+from api_analytics.fastapi import Analytics
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -16,9 +19,14 @@ import src.constants as const
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+formatter = logging.Formatter("%(levelname)s:    %(message)s")
+for handler in logging.getLogger().handlers:
+    handler.setFormatter(formatter)
+
 
 # Configuration
 REFRESH_INTERVAL_SECONDS = 3600  # 1 hour
+API_ANALYTICS_KEY = os.environ.get("API_ANALYTICS_KEY")
 
 # Global data cache - refreshed hourly
 league_data = None
@@ -41,7 +49,8 @@ async def refresh_league_data():
         {"index": i, "label": f"{match.home_team.team_name} vs {match.away_team.team_name}"}
         for i, match in enumerate(box_scores_cache)
     ]
-    last_update = datetime.now()
+    eastern = zoneinfo.ZoneInfo("America/New_York")
+    last_update = datetime.now(eastern)
     logger.info(f"League data refreshed at {last_update}")
 
 
@@ -72,7 +81,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Space Jammers Dashboard", lifespan=lifespan)
-
+if API_ANALYTICS_KEY:
+    logger.info(" Adding API Analytics middleware")
+    app.add_middleware(Analytics, api_key=API_ANALYTICS_KEY)
 # Setup templates
 templates = Jinja2Templates(directory="src/frontend/templates")
 
