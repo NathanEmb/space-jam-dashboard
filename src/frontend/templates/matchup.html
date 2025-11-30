@@ -149,6 +149,31 @@
         width: 130px;
     }
 
+    .category-name-cell {
+      padding: 0;
+    }
+
+    .category-flex {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100px;
+    }
+
+    .category-label {
+      flex: 0 1 auto;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin: 0 0.3rem;
+    }
+
+    .arrow-placeholder {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+    }
+
     .stat-cell {
         position: relative;
     }
@@ -390,18 +415,32 @@
                         <span class="rank-indicator">#{{ cat.home_rank }}</span>
                     </span>
                 </td>
-                <td class="category-name">
-                    {% if cat.advantage_side == 'home' and cat.advantage == 'large' %}
-                    <span class="advantage-arrow large home-advantage"><i data-feather="chevrons-left"></i></span>
-                    {% elif cat.advantage_side == 'home' and cat.advantage == 'small' %}
-                    <span class="advantage-arrow home-advantage"><i data-feather="chevron-left"></i></span>
+                <td class="category-name-cell">
+                  <span class="category-flex">
+                    {% if cat.advantage_side == 'home' %}
+                      {% if cat.advantage == 'large' %}
+                        <span class="advantage-arrow large home-advantage"><i data-feather="chevrons-left"></i></span>
+                      {% elif cat.advantage == 'small' %}
+                        <span class="advantage-arrow home-advantage"><i data-feather="chevron-left"></i></span>
+                      {% else %}
+                        <span class="arrow-placeholder"></span>
+                      {% endif %}
+                    {% else %}
+                      <span class="arrow-placeholder"></span>
                     {% endif %}
-                    {{ cat.name }}
-                    {% if cat.advantage_side == 'away' and cat.advantage == 'large' %}
-                    <span class="advantage-arrow large away-advantage"><i data-feather="chevrons-right"></i></span>
-                    {% elif cat.advantage_side == 'away' and cat.advantage == 'small' %}
-                    <span class="advantage-arrow away-advantage"><i data-feather="chevron-right"></i></span>
+                    <span class="category-label">{{ cat.name }}</span>
+                    {% if cat.advantage_side == 'away' %}
+                      {% if cat.advantage == 'large' %}
+                        <span class="advantage-arrow large away-advantage"><i data-feather="chevrons-right"></i></span>
+                      {% elif cat.advantage == 'small' %}
+                        <span class="advantage-arrow away-advantage"><i data-feather="chevron-right"></i></span>
+                      {% else %}
+                        <span class="arrow-placeholder"></span>
+                      {% endif %}
+                    {% else %}
+                      <span class="arrow-placeholder"></span>
                     {% endif %}
+                  </span>
                 </td>
                 <td class="rank-cell rank-right">
                     <span class="rank-cell-content">
