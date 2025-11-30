@@ -34,6 +34,23 @@ wheels = [
 ]
 
 [[package]]
+name = "api-analytics"
+version = "1.2.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bf/a2/f8705c0dc526f83c4e2bf62e4579afcec97685a0c37730d384b47fc7bacb/api_analytics-1.2.7.tar.gz", hash = "sha256:e885aaf819b052fe2dc41f256f23e671f4696c7b23af6b3c5c3acdc7b81821ea", size = 14387 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/aa/76/6099c5aefae407a24898d16b3aebc5f08c95c6b1bcf7fb840d01799f6982/api_analytics-1.2.7-py3-none-any.whl", hash = "sha256:eaff6c5d20457dec7fb95c54a0c45bbc7e0d7fdabfb5300e0ffce61a49808755", size = 13896 },
+]
+
+[package.optional-dependencies]
+fastapi = [
+    { name = "fastapi" },
+]
+
+[[package]]
 name = "certifi"
 version = "2025.11.12"
 source = { registry = "https://pypi.org/simple" }
@@ -499,6 +516,7 @@ name = "space-jam-dashboard"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "api-analytics", extra = ["fastapi"] },
     { name = "espn-api" },
     { name = "fastapi" },
     { name = "jinja2" },
@@ -508,6 +526,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "api-analytics", extras = ["fastapi"], specifier = ">=1.2.7" },
     { name = "espn-api", specifier = ">=0.43.0" },
     { name = "fastapi", specifier = ">=0.115.0" },
     { name = "jinja2", specifier = ">=3.1.4" },
